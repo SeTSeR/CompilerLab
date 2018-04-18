@@ -75,7 +75,13 @@ int main(int argc, char** argv) {
 	double x1 = root(f, df, g, dg, *a, *b, eps1);
 	double x2 = root(g, dg, h, dh, *a, *b, eps1);
 	double x3 = root(h, dh, f, df, *a, *b, eps1);
-	eps1 /= dist(g(x1) - f(x1), h(x2) - g(x2), f(x3) - h(x3));
+	double neweps1 = eps1 / dist(g(x1) - f(x1), h(x2) - g(x2), f(x3) - h(x3));
+	if(neweps1 < eps1) {
+		eps1 = neweps1;
+		double x1 = root(f, df, g, dg, *a, *b, eps1);
+		double x2 = root(g, dg, h, dh, *a, *b, eps1);
+		double x3 = root(h, dh, f, df, *a, *b, eps1);
+	}
 	if(debug) {
 		for(double x = *a; x < *b; x += 0.5) {
 			printf("%f ", (*df)(x));
