@@ -1,22 +1,20 @@
-c_temp = /tmp/_asm_build_$$.c
-o_temp = /tmp/_asm_build_$$.o
+SPEC_FILE ?= input.txt
 YASMFLAGS = -g dwarf2 -DUNIX -felf64
-CFLAGS = -g -Iinclude/
-LDFLAGS = -lm
-OBJ = main.o analytic.o
 
 all: solver
-	mv solver/solver .
+	mv solver/solver main
 
 clean:
 	rm output.asm
-	rm solver
+	rm main
+	rm compiler/compiler
 	rm solver/*.o
 	rm compiler/*.o
 
-solver: compiler input.txt
-	compiler/compiler input.txt output.asm
+solver: compiler $(SPEC_FILE)
+	compiler/compiler $(SPEC_FILE) output.asm
 	yasm $(YASMFLAGS) output.asm -o solver/functions.o
 	make -C solver
 
 compiler:
+	make -C compiler
