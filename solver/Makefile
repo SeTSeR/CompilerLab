@@ -1,6 +1,6 @@
 CFLAGS = -g -I../include
 LDFLAGS = -lm
-OBJ = analytic.o functions.o main.o
+OBJ = analytic.o main.o functions.o
 
 ifeq ($(METHOD), binary)
 	CFLAGS += -DSOLVE_BINARY

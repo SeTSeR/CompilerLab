@@ -22,9 +22,21 @@ double integrate(double (*f)(double), double a, double b, double eps) {
 	return sum2;
 }
 
+double (*givenf)(double);
+double (*giveng)(double);
+double (*givendf)(double);
+double (*givendg)(double);
+
+inline static double fming(double x) {
+	return (*givenf)(x) - (*giveng)(x);
+}
+
+inline static double dfmindg(double x) {
+	return (*givendf)(x) - (*givendg)(x);
+}
 
 #ifdef SOLVE_BINARY
-double solve(double (*f)(double), double(*df)(double), double(*d2f)(double), double a, double b, double eps) {
+static double solve(double (*f)(double), double(*df)(double), double a, double b, double eps) {
 	while((b - a) >= eps) {
 		if((*f)(a + eps/2) * (*f)(a - eps/2) < 0) break;
 		double mid = a + (b - a) / 2;
@@ -34,13 +46,15 @@ double solve(double (*f)(double), double(*df)(double), double(*d2f)(double), dou
 	return a;
 }
 #else
-double solve(double (*f)(double), double (*df)(double), double (*d2f)(double), double a, double b, double eps) {
+static double solve(double (*f)(double), double (*df)(double), double a, double b, double eps) {
 	while((b - a) > (2 * eps)) {
-		if((*f)(a) * (*d2f)(a) < 0) 
+		double sign2 = (*df)(a + eps) - (*df)(a);
+		if((*f)(a) * sign2 < 0) 
 			a = a - ((*f)(a))*(a - b)/((*f)(a) - (*f)(b));
 		else
 			a = a - (*f)(a)/((*df)(a));
-		if((*f)(b) * (*d2f)(a) < 0)
+		sign2 = (*df)(b + eps) - (*df)(b);
+		if((*f)(b) * sign2 < 0)
 			b = b - ((*f)(b))*(b - a)/((*f)(b) - (*f)(a));
 		else
 			b = b - (*f)(b)/((*df)(b));
@@ -48,3 +62,10 @@ double solve(double (*f)(double), double (*df)(double), double (*d2f)(double), d
 	return a + (b - a) / 2;
 }
 #endif
+
+double root(double (*f)(double), double (*df)(double),
+			double (*g)(double), double (*dg)(double),
+			double a, double b, double eps) {
+	givenf = f, giveng = g, givendf = df, givendg = dg;
+	return solve(fming, dfmindg, a, b, eps);
+}
