@@ -1,5 +1,5 @@
 CFLAGS = -g -I../include
-LDFLAGS = -lm
+LDFLAGS = -ldl
 OBJ = analytic.o main.o functions.o
 
 ifeq ($(METHOD), binary)
@@ -7,7 +7,7 @@ ifeq ($(METHOD), binary)
 endif
 
 all: $(OBJ)
-	$(CC) $(LDFLAGS) $(OBJ) -o solver
+	$(CC) $(OBJ) -o solver $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
