@@ -77,31 +77,10 @@ int main(int argc, char** argv) {
 		}
 		printf("\n");
 	}
-	if(x2 < x1) {
-		double tmp = x1;
-		x1 = x2;
-		x2 = tmp;
-		swap(f, h);
-		swap(df, dh);
-	}
-	if(x3 < x1) {
-		double tmp = x1;
-		x1 = x2;
-		x2 = tmp;
-		swap(g, h);
-		swap(dg, dh);
-	}
-	if(x3 < x2) {
-		double tmp = x1;
-		x1 = x2;
-		x2 = tmp;
-		swap(f, g);
-		swap(df, dg);
-	}
 	if(debug){
 		printf("Roots: %f %f %f\n", x1, x2, x3);
 	}
-	double answer = fabs(integrate(f, x1, x3, eps2) + integrate(g, x3, x2, eps2) + integrate(h, x2, x1, eps2));
+	double answer = fabs(integrate(f, x1, x3, eps2) + integrate(h, x3, x2, eps2) + integrate(g, x2, x1, eps2));
 	printf("The answer is: %f\n", answer);
 	dlclose(handle);
 	return 0;
