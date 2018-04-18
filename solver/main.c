@@ -8,8 +8,7 @@
 
 #include "analytic.h"
 
-#define eps1 0.00001
-#define eps2 0.00001
+#define eps2 0.00057735026 // 0.001/sqrt(3)
 
 static inline void error(char* message) {
 	fprintf(stderr, "%s\n", message);
@@ -26,6 +25,10 @@ static inline void swap(void* a, void* b) {
 	void *tmp = a;
 	a = b;
 	b = tmp;
+}
+
+static inline double dist(double x, double y, double z) {
+	return x * x + y * y + z * z;
 }
 
 int main(int argc, char** argv) {
@@ -68,9 +71,11 @@ int main(int argc, char** argv) {
 	if(errmsg = dlerror()) error(errmsg);
 	b = (double*)dlsym(handle, "b");
 	if(errmsg = dlerror()) error(errmsg);
+	double eps1 = 0.001;
 	double x1 = root(f, df, g, dg, *a, *b, eps1);
 	double x2 = root(g, dg, h, dh, *a, *b, eps1);
 	double x3 = root(h, dh, f, df, *a, *b, eps1);
+	eps1 /= dist(g(x1) - f(x1), h(x2) - g(x2), f(x3) - h(x3));
 	if(debug) {
 		for(double x = *a; x < *b; x += 0.5) {
 			printf("%f ", (*df)(x));
