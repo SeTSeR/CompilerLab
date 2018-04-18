@@ -22,7 +22,19 @@ double integrate(double (*f)(double), double a, double b, double eps) {
 	return sum2;
 }
 
-double solve_newton(double (*f)(double), double (*df)(double), double (*d2f)(double), double a, double b, double eps) {
+
+#ifdef SOLVE_BINARY
+double solve(double (*f)(double), double(*df)(double), double(*d2f)(double), double a, double b, double eps) {
+	while((b - a) >= eps) {
+		if((*f)(a + eps/2) * (*f)(a - eps/2) < 0) break;
+		double mid = a + (b - a) / 2;
+		if((*f)(a) * (*f)(mid) < 0) b = mid;
+		else a = mid;
+	}
+	return a;
+}
+#else
+double solve(double (*f)(double), double (*df)(double), double (*d2f)(double), double a, double b, double eps) {
 	while((b - a) > (2 * eps)) {
 		if((*f)(a) * (*d2f)(a) < 0) 
 			a = a - ((*f)(a))*(a - b)/((*f)(a) - (*f)(b));
@@ -35,13 +47,4 @@ double solve_newton(double (*f)(double), double (*df)(double), double (*d2f)(dou
 	}
 	return a + (b - a) / 2;
 }
-
-double solve_binsearch(double (*f)(double), double a, double b, double eps) {
-	while((b - a) >= eps) {
-		if((*f)(a + eps/2) * (*f)(a - eps/2) < 0) break;
-		double mid = a + (b - a) / 2;
-		if((*f)(a) * (*f)(mid) < 0) b = mid;
-		else a = mid;
-	}
-	return a;
-}
+#endif

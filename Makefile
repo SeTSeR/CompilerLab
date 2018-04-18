@@ -1,5 +1,6 @@
 SPEC_FILE ?= input.txt
 YASMFLAGS = -g dwarf2 -DUNIX -felf64
+METHOD ?= newton
 
 all: solver
 	mv solver/solver main
@@ -18,3 +19,5 @@ solver: compiler $(SPEC_FILE)
 
 compiler:
 	make -C compiler
+
+.PHONY: solver compiler all clean
