@@ -83,8 +83,29 @@ int main(int argc, char** argv) {
 		double x3 = root(h, dh, f, df, *a, *b, eps1);
 	}
 	if(debug) {
-		for(double x = *a; x < *b; x += 0.5) {
+		printf("f(x):\n");
+		for(double x = *a; x <= *b; x += 0.5) {
+			printf("%f ", (*f)(x));
+		}
+		printf("\ng(x):\n");
+		for(double x = *a; x <= *b; x += 0.5) {
+			printf("%f ", (*g)(x));
+		}
+		printf("\nh(x):\n");
+		for(double x = *a; x <= *b; x += 0.5) {
+			printf("%f ", (*h)(x));
+		}
+		printf("\ndf(x):\n");
+		for(double x = *a; x <= *b; x += 0.5) {
 			printf("%f ", (*df)(x));
+		}
+		printf("\ndg(x):\n");
+		for(double x = *a; x <= *b; x += 0.5) {
+			printf("%f ", (*dg)(x));
+		}
+		printf("\ndh(x):\n");
+		for(double x = *a; x <= *b; x += 0.5) {
+			printf("%f ", (*dh)(x));
 		}
 		printf("\n");
 	}

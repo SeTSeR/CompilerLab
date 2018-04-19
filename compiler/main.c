@@ -4,7 +4,7 @@
 int main(int argc, char** argv) {
 	if(argc < 3) return -1;
 	FILE *out = fopen(argv[2], "wt");
-	fputs("BITS 64\n \
+	fputs("[BITS 64]\n \
 		   default rel\n \
 		   global a\n \
 		   global b\n \
@@ -16,26 +16,26 @@ int main(int argc, char** argv) {
 		   global df3\n \
 		   \n \
 		   section .rodata\n \
-		   a dq 0.0\n \
-		   b dq 4.0\n \
-		   const1 dq 2.0\n \
-		   const2 dq 4.0\n \
-		   const3 dq 0.2\n \
-		   const4 dq -0.25\n \
+		   a dq -3.0\n \
+		   b dq 1.5\n \
+		   const1 dq 5.0\n \
+		   const2 dq 3.0\n \
 		   \n \
 		   section .text\n \
 		   f1:\n \
 		   push rbp\n \
 		   mov rbp, rsp\n \
 		   movsd qword[rsp - 8], xmm0\n \
-		   fld qword[const1]\n \
 		   fld qword[rsp - 8]\n \
-		   fld qword[const2]\n \
-		   fdivp\n \
-		   fptan\n \
-		   fxch\n \
+		   fld1\n \
+		   fld st1\n \
+		   fprem\n \
+		   f2xm1\n \
+		   faddp\n \
+		   fscale\n \
 		   fstp st1\n \
-		   fsubp\n \
+		   fld1\n \
+		   faddp\n \
 		   fstp qword[rsp - 8]\n \
 		   movsd xmm0, qword[rsp - 8]\n \
 		   pop rbp\n \
@@ -46,6 +46,12 @@ int main(int argc, char** argv) {
 		   mov rbp, rsp\n \
 		   movsd qword[rsp - 8], xmm0\n \
 		   fld qword[rsp - 8]\n \
+		   fld st0\n \
+		   fmulp\n \
+		   fld st0\n \
+		   fmulp\n \
+		   fld qword[rsp - 8]\n \
+		   fmulp\n \
 		   fstp qword[rsp - 8]\n \
 		   movsd xmm0, qword[rsp - 8]\n \
 		   pop rbp\n \
@@ -55,9 +61,11 @@ int main(int argc, char** argv) {
 		   push rbp\n \
 		   mov rbp, rsp\n \
 		   movsd qword[rsp - 8], xmm0\n \
-		   fld qword[const3]\n \
-		   fldpi\n \
-		   fmulp\n \
+		   fld1\n \
+		   fld qword[rsp - 8]\n \
+		   fsubp\n \
+		   fld qword[const2]\n \
+		   fdivp\n \
 		   fstp qword[rsp - 8]\n \
 		   movsd xmm0, qword[rsp - 8]\n \
 		   pop rbp\n \
@@ -67,15 +75,15 @@ int main(int argc, char** argv) {
 		   push rbp\n \
 		   mov rbp, rsp\n \
 		   movsd qword[rsp - 8], xmm0\n \
-		   fld qword[const4]\n \
 		   fld qword[rsp - 8]\n \
-		   fld qword[const2]\n \
-		   fdivp\n \
-		   fcos\n \
-		   fld st0\n \
-		   fmulp\n \
 		   fld1\n \
-		   fdivrp\n \
+		   fld st1\n \
+		   fprem\n \
+		   f2xm1\n \
+		   faddp\n \
+		   fscale\n \
+		   fstp st1\n \
+		   fldln2\n \
 		   fmulp\n \
 		   fstp qword[rsp - 8]\n \
 		   movsd xmm0, qword[rsp - 8]\n \
@@ -86,7 +94,13 @@ int main(int argc, char** argv) {
 		   push rbp\n \
 		   mov rbp, rsp\n \
 		   movsd qword[rsp - 8], xmm0\n \
-		   fld1\n \
+		   fld qword[rsp - 8]\n \
+		   fld st0\n \
+		   fmulp\n \
+		   fld st0\n \
+		   fmulp\n \
+		   fld qword[const1]\n \
+		   fmulp\n \
 		   fstp qword[rsp - 8]\n \
 		   movsd xmm0, qword[rsp - 8]\n \
 		   pop rbp\n \
@@ -96,7 +110,10 @@ int main(int argc, char** argv) {
 		   push rbp\n \
 		   mov rbp, rsp\n \
 		   movsd qword[rsp - 8], xmm0\n \
-		   fldz\n \
+		   fld1\n \
+		   fld qword[const2]\n \
+		   fdivp\n \
+		   fchs\n \
 		   fstp qword[rsp - 8]\n \
 		   movsd xmm0, qword[rsp - 8]\n \
 		   pop rbp\n \

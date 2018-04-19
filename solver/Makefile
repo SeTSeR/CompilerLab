@@ -2,7 +2,7 @@ CFLAGS = -g -I../include
 LDFLAGS = -ldl
 OBJ = analytic.o main.o functions.o
 
-ifeq ($(METHOD), binary)
+ifeq ($(SOLVE_METHOD), binary)
 	CFLAGS += -DSOLVE_BINARY
 endif
 
