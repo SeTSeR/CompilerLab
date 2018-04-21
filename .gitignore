@@ -1,5 +1,6 @@
 *.asm
 *.o
+log.txt
 main
 solver/*.o
 compiler/*.o

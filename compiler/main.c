@@ -1,3 +1,4 @@
+#include "differentiate.h"
 #include "parser.h"
 
 #include <stdio.h>
@@ -204,6 +205,20 @@ int main(int argc, char** argv) {
 	AST* tree = parse(buf);
 	FILE *log = fopen("log.txt", "wt");
 	print_tree(tree, 0, log);
+	fprintf(log, "\n");
+	print_tree(derivative(tree), 0, log);
+	fprintf(log, "\n");
+	fgets(buf, 256, in);
+	tree = parse(buf);
+	print_tree(tree, 0, log);
+	fprintf(log, "\n");
+	print_tree(derivative(tree), 0, log);
+	fprintf(log, "\n");
+	fgets(buf, 256, in);
+	tree = parse(buf);
+	print_tree(tree, 0, log);
+	fprintf(log, "\n");
+	print_tree(derivative(tree), 0, log);
 	fclose(log);
 	delete_tree(tree);
 	fclose(in);

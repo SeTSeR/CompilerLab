@@ -33,5 +33,6 @@ struct AST {
 typedef struct AST AST;
 
 AST *parse(char* s);
+AST *copy_ast(AST *tree);
 
 #endif

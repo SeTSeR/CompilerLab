@@ -86,3 +86,24 @@ AST *parse(char *str) {
 	}
 	return pop(stack);
 }
+
+AST* copy_ast(AST* src) {
+	if(src == NULL) return NULL;
+	AST* ans = calloc(1, sizeof(AST));
+	ans->type = src->type;
+	switch(src->type) {
+		case NUMBER:
+			ans->value = src->value;
+			break;
+		case VARIABLE:
+			break;
+		case OPERATOR:
+			ans->op_type = src->op_type;
+			ans->first_param = copy_ast(src->first_param);
+			ans->second_param = copy_ast(src->second_param);
+			break;
+		default:
+			break;
+	}
+	return ans;
+}
