@@ -1,7 +1,10 @@
+#include "parser.h"
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-int main(int argc, char** argv) {
+int compile(int argc, char** argv) {
 	if(argc < 3) return -1;
 	FILE *out = fopen(argv[2], "wt");
 	fputs("[BITS 64]\n \
@@ -120,4 +123,89 @@ int main(int argc, char** argv) {
 		   ret\n", out);
 	fclose(out);
 	return 0;
+}
+
+static void print_tree(AST* tree, int level, FILE* log) {
+	char spaces[128] = "";
+	memset(spaces, ' ', level);
+	if(tree) {
+		switch(tree->type) {
+			case VARIABLE:
+				fprintf(log, "%sNode type: variable\n", spaces);
+				fprintf(log, "%sNode value: x\n", spaces);
+				break;
+			case NUMBER:
+				fprintf(log, "%sNode type: number\n", spaces);
+				fprintf(log, "%sNode value: %lf\n", spaces, tree->value);
+				break;
+			case OPERATOR:
+				fprintf(log, "%sNode type: operator\n", spaces);
+				char* operator_type;
+				switch(tree->op_type) {
+					case PLUS:
+						operator_type = "+";
+						break;
+					case MINUS:
+						operator_type = "-";
+						break;
+					case MULTIPLY:
+						operator_type = "*";
+						break;
+					case DIVIDE:
+						operator_type = "/";
+						break;
+					case SIN:
+						operator_type = "sin";
+						break;
+					case COS:
+						operator_type = "cos";
+						break;
+					case TAN:
+						operator_type = "tan";
+						break;
+					case CTG:
+						operator_type = "ctg";
+						break;
+				}
+				fprintf(log, "%sNode value: %s\n", spaces, operator_type);
+				print_tree(tree->first_param, level + 1, log);
+				print_tree(tree->second_param, level + 1, log);
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+static void delete_tree(AST* tree) {
+	if(tree) {
+		switch(tree->type) {
+			case NUMBER:
+			case VARIABLE:
+				free(tree);
+				break;
+			case OPERATOR:
+				delete_tree(tree->first_param);
+				if(tree->second_param) delete_tree(tree->second_param);
+				free(tree);
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+int main(int argc, char** argv) {
+	if(argc < 3) return -1;
+	FILE *in = fopen(argv[1], "rt");
+	char buf[256];
+	fgets(buf, 256, in);
+	fgets(buf, 256, in);
+	AST* tree = parse(buf);
+	FILE *log = fopen("log.txt", "wt");
+	print_tree(tree, 0, log);
+	fclose(log);
+	delete_tree(tree);
+	fclose(in);
+	return compile(argc, argv);
 }

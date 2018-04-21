@@ -1,5 +1,5 @@
 CFLAGS = -g -I../include
-OBJ = parser.o optimizer.o codegen.o main.o
+OBJ = stackast.o parser.o optimizer.o codegen.o main.o
 
 all: $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o compiler $(LDFLAGS)

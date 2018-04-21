@@ -1,3 +1,6 @@
+#ifndef _PARSER_H
+#define _PARSER_H
+
 enum TOKEN_TYPE {
 	VARIABLE,
 	NUMBER,
@@ -18,7 +21,7 @@ enum OPERATOR_TYPE {
 struct AST {
 	int type;
 	union {
-		int value;
+		double value;
 		struct {
 			int op_type;
 			struct AST *first_param;
@@ -30,3 +33,5 @@ struct AST {
 typedef struct AST AST;
 
 AST *parse(char* s);
+
+#endif
