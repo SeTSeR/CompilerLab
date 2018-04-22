@@ -1,3 +1,4 @@
+#include "codegen.h"
 #include "differentiate.h"
 #include "parser.h"
 
@@ -201,26 +202,18 @@ int main(int argc, char** argv) {
 	FILE *in = fopen(argv[1], "rt");
 	char buf[256];
 	fgets(buf, 256, in);
-	fgets(buf, 256, in);
-	AST* tree = parse(buf);
-	FILE *log = fopen("log.txt", "wt");
-	print_tree(tree, 0, log);
-	fprintf(log, "\n");
-	print_tree(derivative(tree), 0, log);
-	fprintf(log, "\n");
-	fgets(buf, 256, in);
-	tree = parse(buf);
-	print_tree(tree, 0, log);
-	fprintf(log, "\n");
-	print_tree(derivative(tree), 0, log);
-	fprintf(log, "\n");
-	fgets(buf, 256, in);
-	tree = parse(buf);
-	print_tree(tree, 0, log);
-	fprintf(log, "\n");
-	print_tree(derivative(tree), 0, log);
-	fclose(log);
-	delete_tree(tree);
-	fclose(in);
-	return compile(argc, argv);
+	double a, b;
+	sscanf(buf, "%lf %lf", &a, &b);
+	AST* trees[6];
+	for(int i = 0; i < 3; ++i) {
+		fgets(buf, 256, in);
+		trees[i] = parse(buf);
+		trees[i + 3] = derivative(trees[i]);
+	}
+	char* names[6] = {"f1", "f2", "f3", "df1", "df2", "df3"};
+	char* code = translate(a, b, 6, trees, names);
+	FILE *out = fopen(argv[2], "wt");
+	fputs(code, out);
+	fclose(out);
+	return 0;
 }

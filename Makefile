@@ -7,7 +7,6 @@ all: solver
 
 clean:
 	rm output.asm
-	rm log.txt
 	rm main
 	rm libfunctions.so
 	rm compiler/compiler
