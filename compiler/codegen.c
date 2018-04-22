@@ -3,8 +3,11 @@
 #include "parser.h"
 #include "symtab.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define eps 0.000001
 
 enum {
 	BUFSIZE = 256,
@@ -12,11 +15,19 @@ enum {
 	FUNC_LEVEL = 4
 };
 
+double predefined[7] = {0.0, 1.0, M_PI, M_LOG2E, M_LN10/M_LN2, M_LN2/M_LN10, M_LN2};
+char* commands[7] = {"fldz", "fld1", "fldpi", "fldl2e", "fldl2t", "fldlg2", "fldln2"};
+
+inline static int is_predefined(double value) {
+	for(int i = 0; i < 7; ++i) if(fabs(value - predefined[i]) < eps) return i;
+	return -1;
+}
+
 static void find_identifiers(identifiers_table *table, AST *tree) {
 	if(tree) {
 		switch(tree->type) {
 			case NUMBER:
-				add_identifier(table, tree->value);
+				if(is_predefined(tree->value) == -1) add_identifier(table, tree->value);
 				break;
 			case VARIABLE:
 				break;
@@ -68,9 +79,12 @@ static char* gen_epilog() {
 static char* gen_node(AST* node, identifiers_table *table) {
 	string *ans = make_string(BUFSIZE);
 	char command[128];
+	int pred = -1;
 	switch(node->type) {
 		case NUMBER:
-			snprintf(command, 128, "fld qword[%s]", lookup(table, node->value));
+			pred = is_predefined(node->value);
+			if((0 <= pred) && (pred < 7)) snprintf(command, 128, "%s", commands[pred]);
+			else snprintf(command, 128, "fld qword[%s]", lookup(table, node->value));
 			append_line(FUNC_LEVEL, ans, command);
 			break;
 		case VARIABLE:
