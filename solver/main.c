@@ -33,15 +33,52 @@ static inline double dist(double x, double y, double z) {
 
 int main(int argc, char** argv) {
 	bool debug = false;
+	bool roots = false;
+	bool iterations = false;
 	for(int i = 1; i < argc; ++i) {
-		if((!strncmp(argv[i], "--help", 6)) || (!strncmp(argv[i], "-h", 2))) {
-			puts("Command-line keys:");
-			puts("--help or -h: prints this message");
-			puts("--debug or -g: enables debugging output");
-			return 0;
+		if(argv[i][1] == '-') {
+			if(!strncmp(argv[i], "--help", 6)) {
+				puts("Command-line keys:");
+				puts("  --help or -h: prints this message");
+				puts("  --roots or -r: enables roots printing");
+				puts("  --debug or -g: enables debugging info");
+				puts("  --iterations or -i: enables printing count of iterations");
+				exit(EXIT_SUCCESS);
+			}
+			else if(!strncmp(argv[i], "--debug", 7)) {
+				debug = true;
+				roots = true;
+				iterations = true;
+			}
+			else if(!strncmp(argv[i], "--roots", 7)) {
+				roots = true;
+			}
+			else if(!strncmp(argv[i], "--iterations", 12)) {
+				iterations = true;
+			}
 		}
-		else if((!strncmp(argv[i], "--debug", 7)) || (!strncmp(argv[i], "-g", 2))) {
-			debug = true;
+		else {
+			if(strchr(argv[i], 'h')) {
+				puts("Command-line keys:");
+				puts("  --help or -h: prints this message");
+				puts("  --roots or -r: enables roots printing");
+				puts("  --debug or -g: enables debugging info");
+				puts("  --iterations or -i: enables printing count of iterations");
+				exit(EXIT_SUCCESS);
+			}
+			if(strchr(argv[i], 'g')) {
+				debug = true;
+				roots = true;
+				iterations = true;
+			}
+			else {
+				if(strchr(argv[i], 'r')) {
+					roots = true;
+				}
+				if(strchr(argv[i], 'i')) {
+					iterations = true;
+				}
+			}
 		}
 	}
 	void *handle = dlopen("./libfunctions.so", RTLD_LAZY);
@@ -72,15 +109,15 @@ int main(int argc, char** argv) {
 	b = (double*)dlsym(handle, "b");
 	if(errmsg = dlerror()) error(errmsg);
 	double eps1 = 0.001;
-	double x1 = root(f, df, g, dg, *a, *b, eps1);
-	double x2 = root(g, dg, h, dh, *a, *b, eps1);
-	double x3 = root(h, dh, f, df, *a, *b, eps1);
+	double x1 = root(f, df, g, dg, *a, *b, eps1, iterations);
+	double x2 = root(g, dg, h, dh, *a, *b, eps1, iterations);
+	double x3 = root(h, dh, f, df, *a, *b, eps1, iterations);
 	double neweps1 = eps1 / dist(g(x1) - f(x1), h(x2) - g(x2), f(x3) - h(x3));
 	if(neweps1 < eps1) {
 		eps1 = neweps1;
-		double x1 = root(f, df, g, dg, *a, *b, eps1);
-		double x2 = root(g, dg, h, dh, *a, *b, eps1);
-		double x3 = root(h, dh, f, df, *a, *b, eps1);
+		double x1 = root(f, df, g, dg, *a, *b, eps1, iterations);
+		double x2 = root(g, dg, h, dh, *a, *b, eps1, iterations);
+		double x3 = root(h, dh, f, df, *a, *b, eps1, iterations);
 	}
 	if(debug) {
 		printf("f(x):\n");
@@ -109,7 +146,7 @@ int main(int argc, char** argv) {
 		}
 		printf("\n");
 	}
-	if(debug){
+	if(roots){
 		printf("Roots: %f %f %f\n", x1, x2, x3);
 	}
 	double answer = fabs(integrate(f, x1, x3, eps2) + integrate(h, x3, x2, eps2) + integrate(g, x2, x1, eps2));

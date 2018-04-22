@@ -36,17 +36,21 @@ inline static double dfmindg(double x) {
 }
 
 #ifdef SOLVE_BINARY
-static double solve(double (*f)(double), double(*df)(double), double a, double b, double eps) {
+static double solve(double (*f)(double), double(*df)(double), double a, double b, double eps, bool print_iterations) {
+	int iterations = 0;
 	while((b - a) >= eps) {
 		if((*f)(a + eps/2) * (*f)(a - eps/2) < 0) break;
 		double mid = a + (b - a) / 2;
 		if((*f)(a) * (*f)(mid) < 0) b = mid;
 		else a = mid;
+		++iterations;
 	}
+	if(print_iterations) printf("Finding solution took %d iterations\n", iterations);
 	return a;
 }
 #else
-static double solve(double (*f)(double), double (*df)(double), double a, double b, double eps) {
+static double solve(double (*f)(double), double (*df)(double), double a, double b, double eps, bool print_iterations) {
+	int iterations = 0;
 	while((b - a) > (2 * eps)) {
 		double sign2 = (*df)(a + eps) - (*df)(a);
 		if((*f)(a) * sign2 < 0) 
@@ -58,14 +62,16 @@ static double solve(double (*f)(double), double (*df)(double), double a, double 
 			b = b - ((*f)(b))*(b - a)/((*f)(b) - (*f)(a));
 		else
 			b = b - (*f)(b)/((*df)(b));
+		++iterations;
 	}
+	if(print_iterations) printf("Finding solution took %d iterations\n", iterations);
 	return a + (b - a) / 2;
 }
 #endif
 
 double root(double (*f)(double), double (*df)(double),
 			double (*g)(double), double (*dg)(double),
-			double a, double b, double eps) {
+			double a, double b, double eps, bool print_iterations) {
 	givenf = f, giveng = g, givendf = df, givendg = dg;
-	return solve(fming, dfmindg, a, b, eps);
+	return solve(fming, dfmindg, a, b, eps, print_iterations);
 }
