@@ -107,3 +107,17 @@ AST* copy_ast(AST* src) {
 	}
 	return ans;
 }
+
+void destroy_tree(AST *tree) {
+	if(tree == NULL) return;
+	switch(tree->type) {
+		case NUMBER:
+		case VARIABLE:
+			break;
+		case OPERATOR:
+			destroy_tree(tree->first_param);
+			destroy_tree(tree->second_param);
+			break;
+	}
+	free(tree);
+}

@@ -34,5 +34,6 @@ typedef struct AST AST;
 
 AST *parse(char* s);
 AST *copy_ast(AST *tree);
+void destroy_tree(AST *tree);
 
 #endif
