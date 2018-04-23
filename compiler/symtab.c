@@ -31,7 +31,10 @@ void destroytable(identifiers_table *table) {
 static identifier* _lookup(identifiers_table* table, double value) {
 	if((table == NULL) || (table->size == 0)) return NULL;
 	for(int i = 0; i < table->size; ++i) {
-		if((table->identifiers[i].name[0] == 'c') && (fabs(table->identifiers[i].value - value) < eps)) return &(table->identifiers[i]);
+		if((table->identifiers[i].name) 
+				&& (table->identifiers[i].name[0] == 'c') 
+				&& (fabs(table->identifiers[i].value - value) < eps))
+			return &(table->identifiers[i]);
 	}
 	return NULL;
 }
@@ -46,7 +49,7 @@ void add_identifier(identifiers_table* table, double value) {
 	if(_lookup(table, value) == NULL) {
 		if(table->size == table->capacity) {
 			table->capacity <<= 1;
-			table->identifiers = realloc(table->identifiers, table->capacity);
+			table->identifiers = realloc(table->identifiers, table->capacity * sizeof(identifier));
 		}
 		int num = table->size;
 		char *name = calloc(IDENTIFIER_LENGTH, sizeof(char));
