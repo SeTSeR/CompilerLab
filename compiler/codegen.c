@@ -4,6 +4,7 @@
 #include "symtab.h"
 
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -15,6 +16,7 @@ enum {
 	FUNC_LEVEL = 4
 };
 
+bool check_predefined = false;
 double predefined[7] = {0.0, 1.0, M_PI, M_LOG2E, M_LN10/M_LN2, M_LN2/M_LN10, M_LN2};
 char* commands[7] = {"fldz", "fld1", "fldpi", "fldl2e", "fldl2t", "fldlg2", "fldln2"};
 
@@ -27,7 +29,7 @@ static void find_identifiers(identifiers_table *table, AST *tree) {
 	if(tree) {
 		switch(tree->type) {
 			case NUMBER:
-				if(is_predefined(tree->value) == -1) add_identifier(table, tree->value);
+				if((!check_predefined) || (is_predefined(tree->value) == -1)) add_identifier(table, tree->value);
 				break;
 			case VARIABLE:
 				break;
@@ -61,7 +63,10 @@ static char* gen_header() {
 
 static char* gen_prolog() {
 	string *ans = make_string(BUFSIZE);
-	append_line(FUNC_LEVEL, ans, "movsd qword[rsp - 8], xmm0");
+	append_line(FUNC_LEVEL, ans, "push rbp");
+	append_line(FUNC_LEVEL, ans, "mov rbp, rsp");
+	append_line(FUNC_LEVEL, ans, "sub rsp, 8");
+	append_line(FUNC_LEVEL, ans, "movsd qword[rsp], xmm0");
 	char *retbuf = ans->buf;
 	free(ans);
 	return retbuf;
@@ -69,8 +74,9 @@ static char* gen_prolog() {
 
 static char* gen_epilog() {
 	string *ans = make_string(BUFSIZE);
-	append_line(FUNC_LEVEL, ans, "fstp qword[rsp - 8]");
-	append_line(FUNC_LEVEL, ans, "movsd xmm0, qword[rsp - 8]");
+	append_line(FUNC_LEVEL, ans, "movsd xmm0, qword[rsp]");
+	append_line(FUNC_LEVEL, ans, "add rsp, 16");
+	append_line(FUNC_LEVEL, ans, "pop rbp");
 	char *retbuf = ans->buf;
 	free(ans);
 	return retbuf;
@@ -82,53 +88,84 @@ static char* gen_node(AST* node, identifiers_table *table) {
 	int pred = -1;
 	switch(node->type) {
 		case NUMBER:
-			pred = is_predefined(node->value);
-			if((0 <= pred) && (pred < 7)) snprintf(command, 128, "%s", commands[pred]);
-			else snprintf(command, 128, "fld qword[%s]", lookup(table, node->value));
-			append_line(FUNC_LEVEL, ans, command);
+			if(check_predefined) {
+				pred = is_predefined(node->value);
+				if((0 <= pred) && (pred < 7)) snprintf(command, 128, "%s", commands[pred]);
+				else snprintf(command, 128, "fld qword[%s]", lookup(table, node->value));
+				append_line(FUNC_LEVEL, ans, command);
+			}
+			else {
+				snprintf(command, 128, "mov rax, qword[%s]", lookup(table, node->value));
+				append_line(FUNC_LEVEL, ans, command);
+				append_line(FUNC_LEVEL, ans, "push rax");
+			}
 			break;
 		case VARIABLE:
-			append_line(FUNC_LEVEL, ans, "fld qword[rsp - 8]");
+			append_line(FUNC_LEVEL, ans, "push qword[rbp - 8]");
 			break;
 		case OPERATOR:
 			switch(node->op_type) {
 				case PLUS:
 					append(ans, gen_node(node->first_param, table));
 					append(ans, gen_node(node->second_param, table));
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp + 8]");
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "faddp");
+					append_line(FUNC_LEVEL, ans, "add rsp, 8");
+					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
 					break;
 				case MINUS:
 					append(ans, gen_node(node->first_param, table));
 					append(ans, gen_node(node->second_param, table));
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp + 8]");
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fsubp");
+					append_line(FUNC_LEVEL, ans, "add rsp, 8");
+					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
 					break;
 				case MULTIPLY:
 					append(ans, gen_node(node->first_param, table));
 					append(ans, gen_node(node->second_param, table));
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp + 8]");
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fmulp");
+					append_line(FUNC_LEVEL, ans, "add rsp, 8");
+					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
 					break;
 				case DIVIDE:
 					append(ans, gen_node(node->first_param, table));
 					append(ans, gen_node(node->second_param, table));
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp + 8]");
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fdivp");
+					append_line(FUNC_LEVEL, ans, "add rsp, 8");
+					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
 					break;
 				case SIN:
 					append(ans, gen_node(node->first_param, table));
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fsin");
+					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
 					break;
 				case COS:
 					append(ans, gen_node(node->first_param, table));
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fcos");
+					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
 					break;
 				case TAN:
 					append(ans, gen_node(node->first_param, table));
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fptan");
 					append_line(FUNC_LEVEL, ans, "fstp st0");
+					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
 					break;
 				case CTG:
 					append(ans, gen_node(node->first_param, table));
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fptan");
 					append_line(FUNC_LEVEL, ans, "fdivp");
+					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
 					break;
 				default:
 					fprintf(stderr, "Unknown operator type: %d", node->op_type);
