@@ -4,28 +4,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define eps 0.00001
-
-inline static bool is_number(AST* tree) {
-	return tree->type == NUMBER;
-}
-
-inline static bool is_operator(AST* tree) {
-	return tree->type == OPERATOR;
-}
-
-inline static bool is_variable(AST* tree) {
-	return tree->type == VARIABLE;
-}
-
-inline static bool is_zero(AST* tree) {
-	return is_number(tree) && (fabs(tree->value) < eps);
-}
-
-inline static bool is_one(AST* tree) {
-	return is_number(tree) && (fabs(tree->value - 1) < eps);
-}
-
 static void fold_constants(AST* tree) {
 	if(tree == NULL) return;
 	if(is_operator(tree)) {

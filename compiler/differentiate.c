@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 AST* derivative(AST* function) {
-	AST* ans = calloc(1, sizeof(AST));
+	AST* ans = create_tree();
 	switch(function->type) {
 		case NUMBER:
 			ans->type = NUMBER;
@@ -25,8 +25,8 @@ AST* derivative(AST* function) {
 					break;
 				case MULTIPLY:
 					ans->op_type = PLUS;
-					AST* laddend = calloc(1, sizeof(AST));
-					AST* raddend = calloc(1, sizeof(AST));
+					AST* laddend = create_tree();
+					AST* raddend = create_tree();
 					laddend->type = OPERATOR;
 					laddend->op_type = MULTIPLY;
 					laddend->first_param = derivative(function->first_param);
@@ -40,12 +40,12 @@ AST* derivative(AST* function) {
 					break;
 				case DIVIDE:
 					ans->op_type = DIVIDE;
-					AST* nominator = calloc(1, sizeof(AST));
-					AST* denominator = calloc(1, sizeof(AST));
+					AST* nominator = create_tree();
+					AST* denominator = create_tree();
 					nominator->type = OPERATOR;
 					nominator->op_type = MINUS;
-					laddend = calloc(1, sizeof(AST));
-					raddend = calloc(1, sizeof(AST));
+					laddend = create_tree();
+					raddend = create_tree();
 					laddend->type = OPERATOR;
 					laddend->op_type = MULTIPLY;
 					laddend->first_param = derivative(function->first_param);
@@ -65,7 +65,7 @@ AST* derivative(AST* function) {
 					break;
 				case SIN:
 					ans->op_type = MULTIPLY;
-					AST* leftarg = calloc(1, sizeof(AST));
+					AST* leftarg = create_tree();
 					AST* rightarg = derivative(function->first_param);
 					leftarg->type = OPERATOR;
 					leftarg->op_type = COS;
@@ -75,13 +75,13 @@ AST* derivative(AST* function) {
 					break;
 				case COS:
 					ans->op_type = MINUS;
-					leftarg = calloc(1, sizeof(AST));
-					rightarg = calloc(1, sizeof(AST));
+					leftarg = create_tree();
+					rightarg = create_tree();
 					leftarg->type = NUMBER;
 					leftarg->value = 0;
 					rightarg->type = OPERATOR;
 					rightarg->op_type = MULTIPLY;
-					AST* rlarg = calloc(1, sizeof(AST));
+					AST* rlarg = create_tree();
 					AST* rrarg = derivative(function->first_param);
 					rlarg->type = OPERATOR;
 					rlarg->op_type = SIN;
@@ -93,8 +93,8 @@ AST* derivative(AST* function) {
 					break;
 				case TAN:
 					ans->op_type = DIVIDE;
-					rightarg = calloc(1, sizeof(AST));
-					rlarg = calloc(1, sizeof(AST));
+					rightarg = create_tree();
+					rlarg = create_tree();
 					rlarg->type = OPERATOR;
 					rlarg->op_type = COS;
 					rlarg->first_param = copy_ast(function->first_param);
@@ -107,14 +107,14 @@ AST* derivative(AST* function) {
 					break;
 				case CTG:
 					ans->op_type = MINUS;
-					leftarg = calloc(1, sizeof(AST));
-					rightarg = calloc(1, sizeof(AST));
+					leftarg = create_tree();
+					rightarg = create_tree();
 					leftarg->type = NUMBER;
 					leftarg->value = 0;
 					rightarg->type = OPERATOR;
 					rightarg->op_type = DIVIDE;
-					rrarg = calloc(1, sizeof(AST));
-					rlarg = calloc(1, sizeof(AST)); //In fact rrlarg, but there are too many variables.
+					rrarg = create_tree();
+					rlarg = create_tree(); //In fact rrlarg, but there are too many variables.
 					rlarg->type = OPERATOR;
 					rlarg->op_type = SIN;
 					rlarg->first_param = copy_ast(function->first_param);

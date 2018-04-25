@@ -13,7 +13,7 @@ AST *parse(char *str) {
 	char *token = strtok(str, " \n");
 	while(token) {
 		if(strlen(token) != 0) {
-			AST* tokast = calloc(1, sizeof(AST));
+			AST* tokast = create_tree();
 			if(isalpha(token[0])) {
 				if(token[0] == 'x') {
 					tokast->type = VARIABLE;
@@ -85,39 +85,4 @@ AST *parse(char *str) {
 		token = strtok(NULL, " \n");
 	}
 	return pop(stack);
-}
-
-AST* copy_ast(AST* src) {
-	if(src == NULL) return NULL;
-	AST* ans = calloc(1, sizeof(AST));
-	ans->type = src->type;
-	switch(src->type) {
-		case NUMBER:
-			ans->value = src->value;
-			break;
-		case VARIABLE:
-			break;
-		case OPERATOR:
-			ans->op_type = src->op_type;
-			ans->first_param = copy_ast(src->first_param);
-			ans->second_param = copy_ast(src->second_param);
-			break;
-		default:
-			break;
-	}
-	return ans;
-}
-
-void destroy_tree(AST *tree) {
-	if(tree == NULL) return;
-	switch(tree->type) {
-		case NUMBER:
-		case VARIABLE:
-			break;
-		case OPERATOR:
-			destroy_tree(tree->first_param);
-			destroy_tree(tree->second_param);
-			break;
-	}
-	free(tree);
 }

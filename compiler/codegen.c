@@ -84,18 +84,18 @@ static char* gen_epilog() {
 
 static char* gen_node(AST* node, identifiers_table *table) {
 	string *ans = make_string(BUFSIZE);
-	char command[128];
+	char command[BUFSIZE];
 	int pred = -1;
 	switch(node->type) {
 		case NUMBER:
 			if(check_predefined) {
 				pred = is_predefined(node->value);
 				if((0 <= pred) && (pred < 7)) snprintf(command, 128, "%s", commands[pred]);
-				else snprintf(command, 128, "fld qword[%s]", lookup(table, node->value));
+				else snprintf(command, BUFSIZE, "fld qword[%s]", lookup(table, node->value));
 				append_line(FUNC_LEVEL, ans, command);
 			}
 			else {
-				snprintf(command, 128, "mov rax, qword[%s]", lookup(table, node->value));
+				snprintf(command, BUFSIZE, "mov rax, qword[%s]", lookup(table, node->value));
 				append_line(FUNC_LEVEL, ans, command);
 				append_line(FUNC_LEVEL, ans, "push rax");
 			}

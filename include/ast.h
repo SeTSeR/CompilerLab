@@ -1,6 +1,8 @@
 #ifndef _AST_H
 #define _AST_H
 
+#include <stdbool.h>
+
 enum TOKEN_TYPE {
 	VARIABLE,
 	NUMBER,
@@ -32,7 +34,14 @@ struct AST {
 
 typedef struct AST AST;
 
-AST *copy_ast(AST *tree);
-void destroy_tree(AST *tree);
+AST *copy_ast(AST*);
+AST *create_tree();
+void destroy_tree(AST*);
+
+bool is_number(AST*);
+bool is_operator(AST*);
+bool is_variable(AST*);
+bool is_zero(AST*);
+bool is_one(AST*);
 
 #endif
