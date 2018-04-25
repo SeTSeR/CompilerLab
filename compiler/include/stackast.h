@@ -10,3 +10,6 @@ void clear(ASTack*);
 void push(ASTack*, AST*);
 AST* pop(ASTack*);
 int size(ASTack*);
+
+ASTack* create_stack();
+void destroy_stack(ASTack*);

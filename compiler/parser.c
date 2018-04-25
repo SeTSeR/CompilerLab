@@ -8,8 +8,7 @@
 #include <stdlib.h>
 
 AST *parse(char *str) {
-	ASTack *stack = calloc(1, sizeof(ASTack*));
-	clear(stack);
+	ASTack *stack = create_stack();
 	char *token = strtok(str, " \n");
 	while(token) {
 		if(strlen(token) != 0) {
@@ -84,5 +83,7 @@ AST *parse(char *str) {
 		}
 		token = strtok(NULL, " \n");
 	}
-	return pop(stack);
+	AST* result = pop(stack);
+	destroy_stack(stack);
+	return result;
 }
