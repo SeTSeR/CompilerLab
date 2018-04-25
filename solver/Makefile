@@ -1,4 +1,4 @@
-CFLAGS = -g -I../include
+CFLAGS = -g -Iinclude
 LDFLAGS = -ldl
 OBJ = analytic.o main.o functions.o
 
