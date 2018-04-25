@@ -56,9 +56,7 @@ static char* gen_header() {
 	append_line(FUNC_LEVEL, ans, "global df1");
 	append_line(FUNC_LEVEL, ans, "global df2");
 	append_line(FUNC_LEVEL, ans, "global df3");
-	char *retbuf = ans->buf;
-	free(ans);
-	return retbuf;
+	return destroy_string(ans);
 }
 
 static char* gen_prolog() {
@@ -67,9 +65,7 @@ static char* gen_prolog() {
 	append_line(FUNC_LEVEL, ans, "mov rbp, rsp");
 	append_line(FUNC_LEVEL, ans, "sub rsp, 8");
 	append_line(FUNC_LEVEL, ans, "movsd qword[rsp], xmm0");
-	char *retbuf = ans->buf;
-	free(ans);
-	return retbuf;
+	return destroy_string(ans);
 }
 
 static char* gen_epilog() {
@@ -77,9 +73,7 @@ static char* gen_epilog() {
 	append_line(FUNC_LEVEL, ans, "movsd xmm0, qword[rsp]");
 	append_line(FUNC_LEVEL, ans, "add rsp, 16");
 	append_line(FUNC_LEVEL, ans, "pop rbp");
-	char *retbuf = ans->buf;
-	free(ans);
-	return retbuf;
+	return destroy_string(ans);
 }
 
 static char* gen_node(AST* node, identifiers_table *table) {
@@ -176,9 +170,7 @@ static char* gen_node(AST* node, identifiers_table *table) {
 			fprintf(stderr, "Unknown node type: %d", node->type);
 			exit(EXIT_FAILURE);
 	}
-	char *retbuf = ans->buf;
-	free(ans);
-	return retbuf;
+	return destroy_string(ans);
 }
 
 static char* gen_function(char* fname, AST* func, identifiers_table *table) {
@@ -188,9 +180,7 @@ static char* gen_function(char* fname, AST* func, identifiers_table *table) {
 	append(ans, gen_node(func, table));
 	append(ans, gen_epilog());
 	append_line(FUNC_LEVEL, ans, "ret");
-	char *retbuf = ans->buf;
-	free(ans);
-	return retbuf;
+	return destroy_string(ans);
 }
 
 static char* gen_rodata(identifiers_table *table) {
@@ -201,9 +191,7 @@ static char* gen_rodata(identifiers_table *table) {
 		snprintf(idline, 128, "%s dq %lf", table->identifiers[i].name, table->identifiers[i].value);
 		append_line(FUNC_LEVEL, ans, idline);
 	}
-	char *retbuf = ans->buf;
-	free(ans);
-	return retbuf;
+	return destroy_string(ans);
 }
 
 static char* gen_text(int n, AST **funcs, char **fnames, identifiers_table *table) {
@@ -213,16 +201,7 @@ static char* gen_text(int n, AST **funcs, char **fnames, identifiers_table *tabl
 		append(ans, gen_function(fnames[i], funcs[i], table));
 		append(ans, "\n");
 	}
-	char *retbuf = ans->buf;
-	free(ans);
-	return retbuf;
-}
-
-static char* template() {
-	string *ans = make_string(BUFSIZE);
-	char *retbuf = ans->buf;
-	free(ans);
-	return retbuf;
+	return destroy_string(ans);
 }
 
 char* translate(double a, double b, int n, AST **funcs, char **fnames) {
@@ -239,7 +218,5 @@ char* translate(double a, double b, int n, AST **funcs, char **fnames) {
 	append(ans, "\n");
 	append(ans, gen_text(n, funcs, fnames, table));
 	destroytable(table);
-	char *retbuf = ans->buf;
-	free(ans);
-	return retbuf;
+	return destroy_string(ans);
 }

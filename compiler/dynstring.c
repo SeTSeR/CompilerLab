@@ -25,6 +25,12 @@ string *from_cstring(char* str) {
 	return new_str;
 }
 
+char* destroy_string(string *str) {
+	char* buf = str->buf;
+	free(str);
+	return buf;
+}
+
 void append(string* str, char* seq) {
 	int seqlen = strlen(seq);
 	if(str->size + seqlen > str->capacity) {

@@ -8,5 +8,7 @@ typedef struct vector {
 
 string *make_string(int);
 string *from_cstring(char*);
+char* destroy_string(string*);
+
 void append(string*, char*);
 void append_line(int, string*, char*);
