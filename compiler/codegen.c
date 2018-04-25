@@ -206,7 +206,7 @@ static char* gen_text(int n, AST **funcs, char **fnames, identifiers_table *tabl
 
 char* translate(double a, double b, int n, AST **funcs, char **fnames) {
 	string *ans = make_string(BUFSIZE);
-	identifiers_table *table = mktable();
+	identifiers_table *table = create_table();
 	add_named_identifier(table, "a", a);
 	add_named_identifier(table, "b", b);
 	for(int i = 0; i < n; ++i) {
@@ -217,6 +217,6 @@ char* translate(double a, double b, int n, AST **funcs, char **fnames) {
 	append(ans, gen_rodata(table));
 	append(ans, "\n");
 	append(ans, gen_text(n, funcs, fnames, table));
-	destroytable(table);
+	destroy_table(table);
 	return destroy_string(ans);
 }

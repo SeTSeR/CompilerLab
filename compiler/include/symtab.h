@@ -11,8 +11,8 @@ typedef struct {
 	size_t capacity;
 } identifiers_table;
 
-identifiers_table* mktable();
-void destroytable(identifiers_table*);
+identifiers_table* create_table();
+void destroy_table(identifiers_table*);
 char* lookup(identifiers_table*, double);
 void add_identifier(identifiers_table*, double);
 void add_named_identifier(identifiers_table*, char*, double);

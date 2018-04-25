@@ -12,7 +12,7 @@ enum {
 	IDENTIFIER_LENGTH = 15
 };
 
-identifiers_table* mktable() {
+identifiers_table* create_table() {
 	identifiers_table *table = calloc(1, sizeof(identifiers_table));
 	table->size = 0;
 	table->capacity = INITIAL_CAPACITY;
@@ -20,7 +20,7 @@ identifiers_table* mktable() {
 	return table;
 }
 
-void destroytable(identifiers_table *table) {
+void destroy_table(identifiers_table *table) {
 	for(int i = 0; i < table->size; ++i) free(table->identifiers[i].name);
 	table->size = 0;
 	table->capacity = 0;
