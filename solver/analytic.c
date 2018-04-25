@@ -53,15 +53,15 @@ static double solve(double (*f)(double), double (*df)(double), double a, double 
 	int iterations = 0;
 	while((b - a) > (2 * eps)) {
 		double sign2 = (*df)(a + eps) - (*df)(a);
-		if((*f)(a) * sign2 < 0) 
+		if((*f)(a) * sign2 < 0)  {
 			a = a - ((*f)(a))*(a - b)/((*f)(a) - (*f)(b));
-		else
-			a = a - (*f)(a)/((*df)(a));
-		sign2 = (*df)(b + eps) - (*df)(b);
-		if((*f)(b) * sign2 < 0)
-			b = b - ((*f)(b))*(b - a)/((*f)(b) - (*f)(a));
-		else
 			b = b - (*f)(b)/((*df)(b));
+		}
+		else {
+			a = a - (*f)(a)/((*df)(a));
+			b = b - ((*f)(b))*(b - a)/((*f)(b) - (*f)(a));
+		}
+		sign2 = (*df)(b + eps) - (*df)(b);
 		++iterations;
 	}
 	if(print_iterations) printf("Finding solution took %d iterations\n", iterations);
