@@ -1,3 +1,3 @@
-#include "parser.h"
+#include "ast.h"
 
 void perform_optimizations(AST* tree);

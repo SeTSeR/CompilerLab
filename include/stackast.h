@@ -1,4 +1,4 @@
-#include "parser.h"
+#include "ast.h"
 
 typedef struct ASTack {
 	AST **stack;

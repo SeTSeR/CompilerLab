@@ -1,3 +1,3 @@
-#include "parser.h"
+#include "ast.h"
 
 AST* derivative(AST*);
