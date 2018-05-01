@@ -7,23 +7,6 @@
 
 #define eps 0.0001
 
-
-double zero(double x) {
-	return 0;
-}
-
-double cube(double x) {
-	return x*x*x;
-}
-
-double dcube(double x) {
-	return 3*x*x;
-}
-
-double cubeminsin(double x) {
-	return cube(x) - sin(x);
-}
-
 int check_solve_sinus() {
 	double rt = root(sin, cos, zero, zero, 0, 1, eps, false);
 	if(fabs(sin(rt)) >= eps) {

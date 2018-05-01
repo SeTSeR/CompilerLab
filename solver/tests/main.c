@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+int testnum = 1;
+
 int main(int argc, char** argv) {
 	int passedcount = 0;
 	passedcount += check_solve_sinus();
@@ -10,6 +12,10 @@ int main(int argc, char** argv) {
 	++testnum;
 	passedcount += check_solve_sincube();
 	++testnum;
-	printf("Solve tests: %d of %d tests passsed\n", passedcount, testnum - 1);
+	passedcount += check_integrate_sinus();
+	++testnum;
+	passedcount += check_integrate_cube();
+	++testnum;
+	printf("Analytic tests: %d of %d tests passsed\n", passedcount, testnum - 1);
 	return 0;
 }
