@@ -5,7 +5,17 @@ BUILD_DIR = build
 OUTPUT_DIR = out
 GENERATED_ASM = output.asm
 
-all: dir solver
+all: build
+
+build: dir solver
+
+run: build
+	$(OUTPUT_DIR)/main -f $(OUTPUT_DIR)/libfunctions.so
+
+tests: build solver_tests
+
+solver_tests:
+	make tests -C solver
 
 dir:
 	mkdir -p $(OUTPUT_DIR)
@@ -16,7 +26,6 @@ clean:
 
 libfunctions.so: compiler $(SPEC_FILE)
 	$(OUTPUT_DIR)/compiler $(SPEC_FILE) $(OUTPUT_DIR)/$(GENERATED_ASM)
-	rm $(BUILD_DIR)/*.o
 	yasm $(YASMFLAGS) $(OUTPUT_DIR)/$(GENERATED_ASM) -o $(BUILD_DIR)/functions.o
 	gcc -shared -o $(OUTPUT_DIR)/libfunctions.so $(BUILD_DIR)/functions.o
 

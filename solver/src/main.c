@@ -31,19 +31,25 @@ static inline double dist(double x, double y, double z) {
 	return x * x + y * y + z * z;
 }
 
+static inline void print_help() {
+	puts("Command-line keys:");
+	puts("  --help or -h: prints this message");
+	puts("  --roots or -r: enables roots printing");
+	puts("  --debug or -g: enables debugging info");
+	puts("  --iterations or -i: enables printing count of iterations");
+	puts("  --libfile or -f <filename>: set path to library file");
+	exit(EXIT_SUCCESS);
+}
+
 int main(int argc, char** argv) {
 	bool debug = false;
 	bool roots = false;
 	bool iterations = false;
+	char libfilename[128] = "./libfunctions.so";
 	for(int i = 1; i < argc; ++i) {
 		if(argv[i][1] == '-') {
 			if(!strncmp(argv[i], "--help", 6)) {
-				puts("Command-line keys:");
-				puts("  --help or -h: prints this message");
-				puts("  --roots or -r: enables roots printing");
-				puts("  --debug or -g: enables debugging info");
-				puts("  --iterations or -i: enables printing count of iterations");
-				exit(EXIT_SUCCESS);
+				print_help();
 			}
 			else if(!strncmp(argv[i], "--debug", 7)) {
 				debug = true;
@@ -56,20 +62,23 @@ int main(int argc, char** argv) {
 			else if(!strncmp(argv[i], "--iterations", 12)) {
 				iterations = true;
 			}
+			else if(!strncmp(argv[i], "--libfile", 9)) {
+				int filelen = strlen(argv[i + 1]);
+				strncpy(libfilename, argv[i + 1], filelen);
+			}
 		}
-		else {
+		else if(argv[i][0] == '-') {
 			if(strchr(argv[i], 'h')) {
-				puts("Command-line keys:");
-				puts("  --help or -h: prints this message");
-				puts("  --roots or -r: enables roots printing");
-				puts("  --debug or -g: enables debugging info");
-				puts("  --iterations or -i: enables printing count of iterations");
-				exit(EXIT_SUCCESS);
+				print_help();
 			}
 			if(strchr(argv[i], 'g')) {
 				debug = true;
 				roots = true;
 				iterations = true;
+			}
+			else if(strchr(argv[i], 'f')) {
+				int filelen = strlen(argv[i + 1]);
+				strncpy(libfilename, argv[i + 1], filelen);
 			}
 			else {
 				if(strchr(argv[i], 'r')) {
@@ -81,7 +90,7 @@ int main(int argc, char** argv) {
 			}
 		}
 	}
-	void *handle = dlopen("./libfunctions.so", RTLD_LAZY);
+	void *handle = dlopen(libfilename, RTLD_LAZY);
 	if(!handle) error(dlerror());
 	dlerror();
 	double (*f)(double);
