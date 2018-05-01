@@ -21,7 +21,7 @@ double predefined[7] = {0.0, 1.0, M_PI, M_LOG2E, M_LN10/M_LN2, M_LN2/M_LN10, M_L
 char* commands[7] = {"fldz", "fld1", "fldpi", "fldl2e", "fldl2t", "fldlg2", "fldln2"};
 
 inline static int is_predefined(double value) {
-	for(int i = 0; i < 7; ++i) if(fabs(value - predefined[i]) < eps) return i;
+	for(size_t i = 0; i < 7; ++i) if(fabs(value - predefined[i]) < eps) return i;
 	return -1;
 }
 
@@ -186,7 +186,7 @@ static char* gen_function(char* fname, AST* func, identifiers_table *table) {
 static char* gen_rodata(identifiers_table *table) {
 	string *ans = make_string(BUFSIZE);
 	append_line(FUNC_LEVEL, ans, "section .rodata");
-	for(int i = 0; i < table->size; ++i) {
+	for(size_t i = 0; i < table->size; ++i) {
 		char idline[128];
 		snprintf(idline, 128, "%s dq %lf", table->identifiers[i].name, table->identifiers[i].value);
 		append_line(FUNC_LEVEL, ans, idline);
@@ -194,22 +194,22 @@ static char* gen_rodata(identifiers_table *table) {
 	return destroy_string(ans);
 }
 
-static char* gen_text(int n, AST **funcs, char **fnames, identifiers_table *table) {
+static char* gen_text(size_t n, AST **funcs, char **fnames, identifiers_table *table) {
 	string *ans = make_string(BUFSIZE);
 	append_line(FUNC_LEVEL, ans, "section .text");
-	for(int i = 0; i < n; ++i) {
+	for(size_t i = 0; i < n; ++i) {
 		append(ans, gen_function(fnames[i], funcs[i], table));
 		append(ans, "\n");
 	}
 	return destroy_string(ans);
 }
 
-char* translate(double a, double b, int n, AST **funcs, char **fnames) {
+char* translate(double a, double b, size_t n, AST **funcs, char **fnames) {
 	string *ans = make_string(BUFSIZE);
 	identifiers_table *table = create_table();
 	add_named_identifier(table, "a", a);
 	add_named_identifier(table, "b", b);
-	for(int i = 0; i < n; ++i) {
+	for(size_t i = 0; i < n; ++i) {
 		find_identifiers(table, funcs[i]);
 	}
 	append(ans, gen_header());

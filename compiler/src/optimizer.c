@@ -109,7 +109,7 @@ static void optimize_arithmetic(AST* tree) {
 					free(tree->first_param);
 					free(tree->second_param);
 					tree->type = NUMBER;
-					tree->value - 0;
+					tree->value = 0;
 				}
 				break;
 			case MULTIPLY:

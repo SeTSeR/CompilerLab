@@ -11,6 +11,7 @@ ASTack *create_stack() {
 	stack->size = 0;
 	stack->capacity = INITIAL_CAPACITY;
 	stack->stack = malloc(stack->capacity * sizeof(AST*));
+    return stack;
 }
 
 void destroy_stack(ASTack *stack) {

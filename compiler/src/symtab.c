@@ -21,7 +21,7 @@ identifiers_table* create_table() {
 }
 
 void destroy_table(identifiers_table *table) {
-	for(int i = 0; i < table->size; ++i) free(table->identifiers[i].name);
+	for(size_t i = 0; i < table->size; ++i) free(table->identifiers[i].name);
 	table->size = 0;
 	table->capacity = 0;
 	free(table->identifiers);
@@ -30,7 +30,7 @@ void destroy_table(identifiers_table *table) {
 
 static identifier* _lookup(identifiers_table* table, double value) {
 	if((table == NULL) || (table->size == 0)) return NULL;
-	for(int i = 0; i < table->size; ++i) {
+	for(size_t i = 0; i < table->size; ++i) {
 		if((table->identifiers[i].name) 
 				&& (table->identifiers[i].name[0] == 'c') 
 				&& (fabs(table->identifiers[i].value - value) < eps))

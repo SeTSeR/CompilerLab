@@ -58,12 +58,15 @@ bool equal(AST *first, AST *second) {
 			return (first->value != second->value);
 			break;
 		case VARIABLE:
+            return true;
 			break;
 		case OPERATOR:
 			if(first->op_type != second->op_type) return false;
 			return (equal(first->first_param, second->first_param) && (equal(first->second_param, second->second_param)));
 			break;
 		default:
+            fprintf(stderr, "Unknown tree type: %d\n", first->type);
+            exit(EXIT_FAILURE);
 			break;
 	}
 }
@@ -86,7 +89,7 @@ void destroy_tree(AST *tree) {
 	free(tree);
 }
 
-static void print_tree(AST* tree, int level, FILE* log) {
+void print_tree(AST* tree, int level, FILE* log) {
 	char spaces[128] = "";
 	memset(spaces, ' ', level);
 	if(tree) {
