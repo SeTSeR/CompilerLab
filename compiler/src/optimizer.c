@@ -92,22 +92,22 @@ static void optimize_arithmetic(AST* tree) {
 		switch(tree->op_type) {
 			case PLUS:
 				if(is_zero(tree->first_param)) {
-					free(tree->first_param);
+					destroy_tree(tree->first_param);
 					move_ast(tree, tree->second_param);
 				}
 				else if(is_zero(tree->second_param)) {
-					free(tree->second_param);
+					destroy_tree(tree->second_param);
 					move_ast(tree, tree->first_param);
 				}
 				break;
 			case MINUS:
 				if(is_zero(tree->second_param)) {
-					free(tree->second_param);
+					destroy_tree(tree->second_param);
 					move_ast(tree, tree->first_param);
 				}
-				if(equal(tree->first_param, tree->second_param)) {
-					free(tree->first_param);
-					free(tree->second_param);
+				else if(equal(tree->first_param, tree->second_param)) {
+					destroy_tree(tree->first_param);
+					destroy_tree(tree->second_param);
 					tree->type = NUMBER;
 					tree->value = 0;
 				}
@@ -125,7 +125,7 @@ static void optimize_arithmetic(AST* tree) {
 						move_ast(tree, tree->second_param);
 					}
 				}
-				if(is_number(tree->second_param)) {
+				else if(is_number(tree->second_param)) {
 					if(is_zero(tree->second_param)) {
 						free(tree->second_param);
 						destroy_tree(tree->first_param);
@@ -145,11 +145,11 @@ static void optimize_arithmetic(AST* tree) {
 					tree->type = NUMBER;
 					tree->value = 0;
 				}
-				if(is_one(tree->second_param)) {
+				else if(is_one(tree->second_param)) {
 					free(tree->second_param);
 					move_ast(tree, tree->first_param);
 				}
-				if(equal(tree->first_param, tree->second_param)) {
+				else if(equal(tree->first_param, tree->second_param)) {
 					free(tree->first_param);
 					free(tree->second_param);
 					tree->type = NUMBER;

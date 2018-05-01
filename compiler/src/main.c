@@ -15,16 +15,19 @@ int main(int argc, char** argv) {
 	double a, b;
 	sscanf(buf, "%lf %lf", &a, &b);
 	AST* trees[6];
-	for(int i = 0; i < 3; ++i) {
+	for(size_t i = 0; i < 3; ++i) {
 		fgets(buf, 256, in);
 		trees[i] = parse(buf);
 		trees[i + 3] = derivative(trees[i]);
 	}
-	for(int i = 0; i < 6; ++i) perform_optimizations(trees[i]);
+	for(size_t i = 0; i < 6; ++i) perform_optimizations(trees[i]);
 	char* names[6] = {"f1", "f2", "f3", "df1", "df2", "df3"};
 	char* code = translate(a, b, 6, trees, names);
 	FILE *out = fopen(argv[2], "wt");
 	fputs(code, out);
 	fclose(out);
+    fclose(in);
+    free(code);
+    for(size_t i = 0; i < 6; ++i) destroy_tree(trees[i]);
 	return 0;
 }
