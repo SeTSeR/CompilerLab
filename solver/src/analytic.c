@@ -7,17 +7,24 @@ double integrate(double (*f)(double), double a, double b, double eps) {
 	int n = 1000;
 	double sum1 = 0, sum2 = 0;
 	double step = (b - a) / n;
-	for(int i = 0; i < n; ++i) {
-		sum2 += ((*f)(a + i * step) + 4*(*f)(a + (i + 0.5) * step) + (*f)(a + (i + 1) * step))*step/6;
+	sum2 = ((*f)(a) + (*f)(b));
+	for(int i = 1; i <= n/2 - 1; ++i) {
+		sum2 += 2*(*f)(a + 2 * i * step);
 	}
+	for(int i = 1; i <= n/2; ++i) {
+		sum2 += 4*(*f)(a + (2 * i - 1) * step);
+	}
+	sum2 *= step/3;
 	while(fabs(sum2 - sum1) >= eps) {
 		sum1 = sum2;
-		sum2 = 0;
+		sum2 /= 2;
+		double addend = 0;
 		n *= 2;
 		step = (b - a) / n;
-		for(int i = 0; i < n; ++i) {
-			sum2 += ((*f)(a + i * step) + 4*(*f)(a + (i + 0.5) * step) + (*f)(a + (i + 1) * step))*step/6;
+		for(int i = 1; i <= n/4; ++i) {
+			addend += 2 * (*f)(a + (4 * i - 1) * step) - (*f)(a + (4 * i - 2) * step) + 2 * (*f)(a + (4 * i - 3) * step);
 		}
+		sum2 += addend*step/1.5;
 	}
 	return sum2;
 }
