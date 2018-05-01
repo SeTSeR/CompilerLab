@@ -28,6 +28,46 @@ AST* copy_ast(AST* src) {
 	return ans;
 }
 
+void move_ast(AST *dest, AST *src) {
+	dest->type = src->type;
+	switch(src->type) {
+		case NUMBER:
+			dest->value = src->value;
+			break;
+		case VARIABLE:
+			break;
+		case OPERATOR:
+			dest->op_type = src->op_type;
+			dest->first_param = src->first_param;
+			dest->second_param = src->second_param;
+			break;
+		default:
+			break;
+	}
+	free(src);
+}
+
+bool equal(AST *first, AST *second) {
+	if(first == NULL) {
+		return (second == NULL);
+	}
+	if(second == NULL) return false;
+	if(first->type != second->type) return false;
+	switch(first->type) {
+		case NUMBER:
+			return (first->value != second->value);
+			break;
+		case VARIABLE:
+			break;
+		case OPERATOR:
+			if(first->op_type != second->op_type) return false;
+			return (equal(first->first_param, second->first_param) && (equal(first->second_param, second->second_param)));
+			break;
+		default:
+			break;
+	}
+}
+
 AST *create_tree() {
 	return calloc(1, sizeof(AST));
 }
