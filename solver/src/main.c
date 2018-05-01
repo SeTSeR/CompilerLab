@@ -9,6 +9,7 @@
 #include "analytic.h"
 
 #define eps2 0.00057735026 // 0.001/sqrt(3)
+#define rightans 0.651664
 
 static inline void error(char* message) {
 	fprintf(stderr, "%s\n", message);
@@ -159,6 +160,7 @@ int main(int argc, char** argv) {
 		printf("Roots: %f %f %f\n", x1, x2, x3);
 	}
 	double answer = fabs(integrate(f, x1, x3, eps2) + integrate(h, x3, x2, eps2) + integrate(g, x2, x1, eps2));
+	if(debug && fabs(answer - rightans) >= eps1) puts("Answer isn't right, is it?");
 	printf("The answer is: %f\n", answer);
 	dlclose(handle);
 	return 0;

@@ -1,8 +1,4 @@
-*.asm
-*.o
-log.txt
-main
-solver/*.o
-compiler/*.o
 compiler/compiler
-*.so
+out/
+build/
+.wakatime-project
