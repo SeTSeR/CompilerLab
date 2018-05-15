@@ -55,7 +55,7 @@ bool equal(AST *first, AST *second) {
 	if(first->type != second->type) return false;
 	switch(first->type) {
 		case NUMBER:
-			return (first->value != second->value);
+			return (fabs(first->value - second->value < eps));
 			break;
 		case VARIABLE:
 			break;
@@ -66,6 +66,7 @@ bool equal(AST *first, AST *second) {
 		default:
 			break;
 	}
+	return true;
 }
 
 AST *create_tree() {
@@ -86,7 +87,7 @@ void destroy_tree(AST *tree) {
 	free(tree);
 }
 
-static void print_tree(AST* tree, int level, FILE* log) {
+void print_tree(AST* tree, int level, FILE* log) {
 	char spaces[128] = "";
 	memset(spaces, ' ', level);
 	if(tree) {

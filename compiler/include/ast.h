@@ -2,6 +2,7 @@
 #define _AST_H
 
 #include <stdbool.h>
+#include <stdio.h>
 
 enum TOKEN_TYPE {
 	VARIABLE,
@@ -38,6 +39,7 @@ AST *copy_ast(AST*);
 AST *create_tree();
 void move_ast(AST*, AST*);
 void destroy_tree(AST*);
+void print_tree(AST*, int, FILE*);
 
 bool is_number(AST*);
 bool is_operator(AST*);

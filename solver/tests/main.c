@@ -4,7 +4,7 @@
 
 int testnum = 1;
 
-int main(int argc, char** argv) {
+int main(void) {
 	int passedcount = 0;
 	passedcount += check_solve_sinus();
 	++testnum;
