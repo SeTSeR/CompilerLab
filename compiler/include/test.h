@@ -15,3 +15,9 @@ int check_differentiate2();
 int check_differentiate3();
 int check_differentiate4();
 int check_differentiate5();
+
+int check_optimize1();
+int check_optimize2();
+int check_optimize3();
+int check_optimize4();
+int check_optimize5();

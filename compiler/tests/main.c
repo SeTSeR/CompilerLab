@@ -29,6 +29,18 @@ int main(void) {
 	++testnum;
 	printf("Differentiate tests: %d of %d tests passed\n", passedcount - prevtests, testnum - prevtests - 1);
 	prevtests = testnum - 1;
+	passedcount += check_optimize1();
+	++testnum;
+	passedcount += check_optimize2();
+	++testnum;
+	passedcount += check_optimize3();
+	++testnum;
+	passedcount += check_optimize4();
+	++testnum;
+	passedcount += check_optimize5();
+	++testnum;
+	printf("Optimizer tests: %d of %d tests passed\n", passedcount - prevtests, testnum - prevtests - 1);
+	prevtests = testnum - 1;
 	printf("Summary: %d of %d tests passed\n", passedcount, testnum - 1);
 	return 0;
 }

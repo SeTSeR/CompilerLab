@@ -1,7 +1,6 @@
 #include "test.h"
 #include "differentiate.h"
 
-
 int check_differentiate1() {
 	char toparse1[] = "2";
 	char toparse2[] = "0";
