@@ -1,5 +1,5 @@
 CFLAGS = -g -Iinclude -c
-LDFLAGS = -ldl -lm
+LDFLAGS = -ldl -lm -lpthread
 TSTLDFLAGS = -lm
 SRC_DIR = src
 BUILD_DIR = ../build/compiler
