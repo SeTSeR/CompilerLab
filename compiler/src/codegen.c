@@ -21,7 +21,7 @@ double predefined[7] = {0.0, 1.0, M_PI, M_LOG2E, M_LN10/M_LN2, M_LN2/M_LN10, M_L
 char* commands[7] = {"fldz", "fld1", "fldpi", "fldl2e", "fldl2t", "fldlg2", "fldln2"};
 
 inline static int is_predefined(double value) {
-	for(int i = 0; i < 7; ++i) if(fabs(value - predefined[i]) < eps) return i;
+	for(size_t i = 0; i < 7; ++i) if(fabs(value - predefined[i]) < eps) return i;
 	return -1;
 }
 
@@ -80,6 +80,7 @@ static char* gen_node(AST* node, identifiers_table *table) {
 	string *ans = make_string(BUFSIZE);
 	char command[BUFSIZE];
 	int pred = -1;
+    char *leftnode, *rightnode;
 	switch(node->type) {
 		case NUMBER:
 			if(check_predefined) {
@@ -100,66 +101,90 @@ static char* gen_node(AST* node, identifiers_table *table) {
 		case OPERATOR:
 			switch(node->op_type) {
 				case PLUS:
-					append(ans, gen_node(node->first_param, table));
-					append(ans, gen_node(node->second_param, table));
+                    leftnode = gen_node(node->first_param, table);
+                    rightnode = gen_node(node->second_param, table);
+					append(ans, leftnode);
+					append(ans, rightnode);
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp + 8]");
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "faddp");
 					append_line(FUNC_LEVEL, ans, "add rsp, 8");
 					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
+                    free(leftnode);
+                    free(rightnode);
 					break;
 				case MINUS:
-					append(ans, gen_node(node->first_param, table));
-					append(ans, gen_node(node->second_param, table));
+                    leftnode = gen_node(node->first_param, table);
+                    rightnode = gen_node(node->second_param, table);
+					append(ans, leftnode);
+					append(ans, rightnode);
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp + 8]");
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fsubp");
 					append_line(FUNC_LEVEL, ans, "add rsp, 8");
 					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
+                    free(leftnode);
+                    free(rightnode);
 					break;
 				case MULTIPLY:
-					append(ans, gen_node(node->first_param, table));
-					append(ans, gen_node(node->second_param, table));
+                    leftnode = gen_node(node->first_param, table);
+                    rightnode = gen_node(node->second_param, table);
+					append(ans, leftnode);
+					append(ans, rightnode);
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp + 8]");
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fmulp");
 					append_line(FUNC_LEVEL, ans, "add rsp, 8");
 					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
+                    free(leftnode);
+                    free(rightnode);
 					break;
 				case DIVIDE:
-					append(ans, gen_node(node->first_param, table));
-					append(ans, gen_node(node->second_param, table));
+                    leftnode = gen_node(node->first_param, table);
+                    rightnode = gen_node(node->second_param, table);
+					append(ans, leftnode);
+					append(ans, rightnode);
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp + 8]");
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fdivp");
 					append_line(FUNC_LEVEL, ans, "add rsp, 8");
 					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
+                    free(leftnode);
+                    free(rightnode);
 					break;
 				case SIN:
-					append(ans, gen_node(node->first_param, table));
+                    leftnode = gen_node(node->first_param, table);
+					append(ans, leftnode);
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fsin");
 					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
+                    free(leftnode);
 					break;
 				case COS:
-					append(ans, gen_node(node->first_param, table));
+                    leftnode = gen_node(node->first_param, table);
+					append(ans, leftnode);
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fcos");
 					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
+                    free(leftnode);
 					break;
 				case TAN:
-					append(ans, gen_node(node->first_param, table));
+                    leftnode = gen_node(node->first_param, table);
+					append(ans, leftnode);
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fptan");
 					append_line(FUNC_LEVEL, ans, "fstp st0");
 					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
+                    free(leftnode);
 					break;
 				case CTG:
-					append(ans, gen_node(node->first_param, table));
+                    leftnode = gen_node(node->first_param, table);
+					append(ans, leftnode);
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fptan");
 					append_line(FUNC_LEVEL, ans, "fdivp");
 					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
+                    free(leftnode);
 					break;
 				default:
 					fprintf(stderr, "Unknown operator type: %d", node->op_type);
@@ -176,17 +201,23 @@ static char* gen_node(AST* node, identifiers_table *table) {
 static char* gen_function(char* fname, AST* func, identifiers_table *table) {
 	string *ans = from_cstring(fname);
 	append(ans, ":\n");
-	append(ans, gen_prolog());
-	append(ans, gen_node(func, table));
-	append(ans, gen_epilog());
+    char *prolog = gen_prolog();
+    char *node = gen_node(func, table);
+    char *epilog = gen_epilog();
+	append(ans, prolog);
+	append(ans, node);
+	append(ans, epilog);
 	append_line(FUNC_LEVEL, ans, "ret");
+    free(prolog);
+    free(node);
+    free(epilog);
 	return destroy_string(ans);
 }
 
 static char* gen_rodata(identifiers_table *table) {
 	string *ans = make_string(BUFSIZE);
 	append_line(FUNC_LEVEL, ans, "section .rodata");
-	for(int i = 0; i < table->size; ++i) {
+	for(size_t i = 0; i < table->size; ++i) {
 		char idline[128];
 		snprintf(idline, 128, "%s dq %lf", table->identifiers[i].name, table->identifiers[i].value);
 		append_line(FUNC_LEVEL, ans, idline);
@@ -194,29 +225,37 @@ static char* gen_rodata(identifiers_table *table) {
 	return destroy_string(ans);
 }
 
-static char* gen_text(int n, AST **funcs, char **fnames, identifiers_table *table) {
+static char* gen_text(size_t n, AST **funcs, char **fnames, identifiers_table *table) {
 	string *ans = make_string(BUFSIZE);
 	append_line(FUNC_LEVEL, ans, "section .text");
-	for(int i = 0; i < n; ++i) {
-		append(ans, gen_function(fnames[i], funcs[i], table));
+	for(size_t i = 0; i < n; ++i) {
+        char *function = gen_function(fnames[i], funcs[i], table);
+		append(ans, function);
 		append(ans, "\n");
+        free(function);
 	}
 	return destroy_string(ans);
 }
 
-char* translate(double a, double b, int n, AST **funcs, char **fnames) {
+char* translate(double a, double b, size_t n, AST **funcs, char **fnames) {
 	string *ans = make_string(BUFSIZE);
 	identifiers_table *table = create_table();
 	add_named_identifier(table, "a", a);
 	add_named_identifier(table, "b", b);
-	for(int i = 0; i < n; ++i) {
+	for(size_t i = 0; i < n; ++i) {
 		find_identifiers(table, funcs[i]);
 	}
-	append(ans, gen_header());
+    char *header = gen_header();
+    char *rodata = gen_rodata(table);
+    char *text = gen_text(n, funcs, fnames, table);
+	append(ans, header);
 	append(ans, "\n");
-	append(ans, gen_rodata(table));
+	append(ans, rodata);
 	append(ans, "\n");
-	append(ans, gen_text(n, funcs, fnames, table));
+	append(ans, text);
 	destroy_table(table);
+    free(header);
+    free(rodata);
+    free(text);
 	return destroy_string(ans);
 }

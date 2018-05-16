@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
 	double a, b;
 	sscanf(buf, "%lf %lf", &a, &b);
 	AST* trees[6];
-	for(int i = 0; i < 3; ++i) {
+	for(size_t i = 0; i < 3; ++i) {
 		fgets(buf, 256, in);
 		trees[i] = parse(buf);
 		trees[i + 3] = derivative(trees[i]);
@@ -26,5 +26,8 @@ int main(int argc, char** argv) {
 	FILE *out = fopen(argv[2], "wt");
 	fputs(code, out);
 	fclose(out);
+    fclose(in);
+    free(code);
+    for(size_t i = 0; i < 6; ++i) destroy_tree(trees[i]);
 	return 0;
 }

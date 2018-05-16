@@ -39,7 +39,7 @@ void append(string* str, char* seq) {
 	}
 	strncpy(str->buf + str->size - 1, seq, seqlen);
 	str->size += seqlen;
-	str->buf[str->size] = 0;
+	str->buf[str->size - 1] = 0;
 }
 
 static void append_before(string* str, char* seq) {
@@ -51,7 +51,7 @@ static void append_before(string* str, char* seq) {
 	memmove(str->buf + seqlen, str->buf, str->size);
 	strncpy(str->buf, seq, seqlen);
 	str->size += seqlen;
-	str->buf[str->size] = 0;
+	str->buf[str->size - 1] = 0;
 }
 
 void append_line(int level, string* str, char* seq) {

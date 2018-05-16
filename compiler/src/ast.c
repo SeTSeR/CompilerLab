@@ -58,12 +58,15 @@ bool equal(AST *first, AST *second) {
 			return (fabs(first->value - second->value < eps));
 			break;
 		case VARIABLE:
+            return true;
 			break;
 		case OPERATOR:
 			if(first->op_type != second->op_type) return false;
 			return (equal(first->first_param, second->first_param) && (equal(first->second_param, second->second_param)));
 			break;
 		default:
+            fprintf(stderr, "Unknown tree type: %d\n", first->type);
+            exit(EXIT_FAILURE);
 			break;
 	}
 	return true;
