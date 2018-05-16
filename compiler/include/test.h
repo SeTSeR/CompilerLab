@@ -21,3 +21,8 @@ int check_optimize2();
 int check_optimize3();
 int check_optimize4();
 int check_optimize5();
+
+int check_symtab_add();
+int check_symtab_add_named();
+int check_symtab_lookup_found();
+int check_symtab_lookup_not_found();

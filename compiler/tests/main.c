@@ -41,6 +41,16 @@ int main(void) {
 	++testnum;
 	printf("Optimizer tests: %d of %d tests passed\n", passedcount - prevtests, testnum - prevtests - 1);
 	prevtests = testnum - 1;
+	passedcount += check_symtab_add();
+	++testnum;
+	passedcount += check_symtab_add_named();
+	++testnum;
+	passedcount += check_symtab_lookup_found();
+	++testnum;
+	passedcount += check_symtab_lookup_not_found();
+	++testnum;
+	printf("Symtab tests: %d of %d tests passed\n", passedcount - prevtests, testnum - prevtests - 1);
+	prevtests = testnum - 1;
 	printf("Summary: %d of %d tests passed\n", passedcount, testnum - 1);
 	return 0;
 }
