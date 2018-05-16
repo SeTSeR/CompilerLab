@@ -150,8 +150,8 @@ static void optimize_arithmetic(AST* tree) {
 					move_ast(tree, tree->first_param);
 				}
 				else if(equal(tree->first_param, tree->second_param)) {
-					free(tree->first_param);
-					free(tree->second_param);
+					destroy_tree(tree->first_param);
+					destroy_tree(tree->second_param);
 					tree->type = NUMBER;
 					tree->value = 1;
 				}
