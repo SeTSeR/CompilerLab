@@ -1,11 +1,12 @@
 #include "test.h"
+#include "parser.h"
 #include "optimizer.h"
 
 int check_optimize1() {
 	char toparse1[] = "2 2 3 + *";
 	char toparse2[] = "10";
 	AST *checked = parse(toparse1);
-	perform_optimizations(checked);
+	optimize(checked);
 	AST *checker = parse(toparse2);
 	int answer = equal(checked, checker);
 	if(answer == 0) {
@@ -24,7 +25,7 @@ int check_optimize2() {
 	char toparse1[] = "x 2 3 + *";
 	char toparse2[] = "x 5 *";
 	AST *checked = parse(toparse1);
-	perform_optimizations(checked);
+	optimize(checked);
 	AST *checker = parse(toparse2);
 	int answer = equal(checked, checker);
 	if(answer == 0) {
@@ -43,7 +44,7 @@ int check_optimize3() {
 	char toparse1[] = "0 x 3 + *";
 	char toparse2[] = "0";
 	AST *checked = parse(toparse1);
-	perform_optimizations(checked);
+	optimize(checked);
 	AST *checker = parse(toparse2);
 	int answer = equal(checked, checker);
 	if(answer == 0) {
@@ -62,7 +63,7 @@ int check_optimize4() {
 	char toparse1[] = "x 3 + sin x 3 + sin -";
 	char toparse2[] = "0";
 	AST *checked = parse(toparse1);
-	perform_optimizations(checked);
+	optimize(checked);
 	AST *checker = parse(toparse2);
 	int answer = equal(checked, checker);
 	if(answer == 0) {
@@ -81,7 +82,7 @@ int check_optimize5() {
 	char toparse1[] = "x 3 + sin x 3 + sin /";
 	char toparse2[] = "1";
 	AST *checked = parse(toparse1);
-	perform_optimizations(checked);
+	optimize(checked);
 	AST *checker = parse(toparse2);
 	int answer = equal(checked, checker);
 	if(answer == 0) {

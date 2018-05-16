@@ -1,4 +1,5 @@
 #include "test.h"
+#include "parser.h"
 
 int check_parse1() {
 	char toparse[] = "2";

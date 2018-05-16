@@ -12,13 +12,13 @@ build: dir solver
 run: build
 	$(OUTPUT_DIR)/main -f $(OUTPUT_DIR)/libfunctions.so
 
-tests: build solver_tests compiler_tests
-
-solver_tests:
-	make tests -C solver
+tests: build compiler_tests solver_tests
 
 compiler_tests:
 	make tests -C compiler
+
+solver_tests:
+	make tests -C solver
 
 dir:
 	mkdir -p $(OUTPUT_DIR)

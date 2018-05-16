@@ -1,3 +1,3 @@
 #include "ast.h"
 
-void perform_optimizations(AST* tree);
+void optimize(AST* tree);

@@ -1,7 +1,5 @@
 #include "test.h"
 
-#include <stdio.h>
-
 int testnum = 1;
 
 int main(void) {

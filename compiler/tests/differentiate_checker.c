@@ -1,4 +1,5 @@
 #include "test.h"
+#include "parser.h"
 #include "differentiate.h"
 
 int check_differentiate1() {

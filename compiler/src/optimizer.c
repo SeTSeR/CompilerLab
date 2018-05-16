@@ -162,7 +162,7 @@ static void optimize_arithmetic(AST* tree) {
 	}
 }
 
-void perform_optimizations(AST* tree) {
+void optimize(AST* tree) {
 	fold_constants(tree);
 	optimize_arithmetic(tree);
 }

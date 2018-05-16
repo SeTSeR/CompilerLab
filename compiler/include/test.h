@@ -1,6 +1,3 @@
-#include "ast.h"
-#include "parser.h"
-
 #include <stdio.h>
 
 extern int testnum;
