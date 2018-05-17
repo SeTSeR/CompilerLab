@@ -2,3 +2,4 @@ compiler/compiler
 out/
 build/
 .wakatime-project
+report/
