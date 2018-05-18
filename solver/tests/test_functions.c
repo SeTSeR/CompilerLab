@@ -18,3 +18,6 @@ double cubeminsin(double x) {
 	return cube(x) - sin(x);
 }
 
+double hardfun(double x) {
+	return fmin(pow(2, x), x * x);
+}

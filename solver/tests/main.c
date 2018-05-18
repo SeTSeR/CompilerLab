@@ -16,6 +16,8 @@ int main(void) {
 	++testnum;
 	passedcount += check_integrate_cube();
 	++testnum;
+	passedcount += check_integrate_hardfun();
+	++testnum;
 	printf("Analytic tests: %d of %d tests passsed\n", passedcount, testnum - 1);
 	return 0;
 }
