@@ -3,7 +3,11 @@
 #include <math.h>
 
 double zero(double x) {
-	return 0;
+	return 0.0;
+}
+
+double two(double x) {
+	return 2.0;
 }
 
 double cube(double x) {
@@ -12,10 +16,6 @@ double cube(double x) {
 
 double dcube(double x) {
 	return 3*x*x;
-}
-
-double cubeminsin(double x) {
-	return cube(x) - sin(x);
 }
 
 double hardfun(double x) {

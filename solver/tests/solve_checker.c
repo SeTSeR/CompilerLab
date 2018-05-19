@@ -13,23 +13,26 @@ int check_solve_sinus() {
 		fprintf(stderr, "Test %d failed: sin(%lf) != 0\n", testnum, rt);
 		return 0;
 	}
+	fprintf(stdout, "Test %d answer: %lf\n", testnum, rt);
 	return 1;
 }
 
 int check_solve_cube() {
-	double rt = root(cube, dcube, zero, zero, 0, 3, eps, false);
-	if(fabs(cube(rt)) >= eps) {
-		fprintf(stderr, "Test %d failed: %lf^3 != 0\n", testnum, rt);
+	double rt = root(cube, dcube, two, zero, 0, 3, eps, false);
+	if(fabs(cube(rt) - 2) >= eps) {
+		fprintf(stderr, "Test %d failed: %lf^3 != 2\n", testnum, rt);
 		return 0;
 	}
+	fprintf(stdout, "Test %d answer: %lf\n", testnum, rt);
 	return 1;
 }
 
 int check_solve_sincube() {
 	double rt = root(cube, dcube, sin, cos, 0.1, 1, eps, false);
-	if(fabs(cubeminsin(rt)) >= eps) {
+	if(fabs(cube(rt) - sin(rt)) >= eps) {
 		fprintf(stderr, "Test %d failed: sin(%lf) != %lf^3\n", testnum, rt, rt);
 		return 0;
 	}
+	fprintf(stdout, "Test %d answer: %lf\n", testnum, rt);
 	return 1;
 }

@@ -11,5 +11,5 @@ int check_integrate_hardfun();
 double cube(double);
 double dcube(double);
 double zero(double);
-double cubeminsin(double);
+double two(double);
 double hardfun(double);
