@@ -23,6 +23,8 @@ AST* copy_ast(AST* src) {
 			ans->second_param = copy_ast(src->second_param);
 			break;
 		default:
+			fprintf(stderr, "Unknown node type: %d\n", src->type);
+			exit(EXIT_FAILURE);
 			break;
 	}
 	return ans;
@@ -42,6 +44,8 @@ void move_ast(AST *dest, AST *src) {
 			dest->second_param = src->second_param;
 			break;
 		default:
+			fprintf(stderr, "Unknown node type: %d\n", src->type);
+			exit(EXIT_FAILURE);
 			break;
 	}
 	free(src);
@@ -85,6 +89,10 @@ void destroy_tree(AST *tree) {
 		case OPERATOR:
 			destroy_tree(tree->first_param);
 			destroy_tree(tree->second_param);
+			break;
+		default:
+			fprintf(stderr, "Unknown node type: %d\n", tree->type);
+			exit(EXIT_FAILURE);
 			break;
 	}
 	free(tree);
@@ -137,6 +145,8 @@ void print_tree(AST* tree, int level, FILE* log) {
 				print_tree(tree->second_param, level + 1, log);
 				break;
 			default:
+				fprintf(stderr, "Unknown node type: %d\n", tree->type);
+				exit(EXIT_FAILURE);
 				break;
 		}
 	}

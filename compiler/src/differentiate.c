@@ -128,13 +128,13 @@ AST* derivative(AST* function) {
 					ans->second_param = rightarg;
 					break;
 				default:
-					fprintf(stderr, "Unknown operator type: %d", function->op_type);
+					fprintf(stderr, "Unknown operator type: %d\n", function->op_type);
 					exit(EXIT_FAILURE);
 					break;
 			}
 			break;
 		default:
-			fprintf(stderr, "Unknown node type: %d", function->type);
+			fprintf(stderr, "Unknown node type: %d\n", function->type);
 			exit(EXIT_FAILURE);
 			break;
 	}

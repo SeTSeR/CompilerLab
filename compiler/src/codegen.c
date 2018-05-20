@@ -38,7 +38,7 @@ static void find_identifiers(identifiers_table *table, AST *tree) {
 				find_identifiers(table, tree->second_param);
 				break;
 			default:
-				fprintf(stderr, "Unknown node type: %d", tree->type);
+				fprintf(stderr, "Unknown node type: %d\n", tree->type);
 				exit(EXIT_FAILURE);
 		}
 	}
@@ -187,12 +187,12 @@ static char* gen_node(AST* node, identifiers_table *table) {
                     free(leftnode);
 					break;
 				default:
-					fprintf(stderr, "Unknown operator type: %d", node->op_type);
+					fprintf(stderr, "Unknown operator type: %d\n", node->op_type);
 					exit(EXIT_FAILURE);
 			}
 			break;
 		default:
-			fprintf(stderr, "Unknown node type: %d", node->type);
+			fprintf(stderr, "Unknown node type: %d\n", node->type);
 			exit(EXIT_FAILURE);
 	}
 	return destroy_string(ans);

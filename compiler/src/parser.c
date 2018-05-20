@@ -75,7 +75,7 @@ AST *parse(char *str) {
 						tokast->op_type = DIVIDE;
 						break;
 					default:
-						fprintf(stderr, "Unknown character: %c", token[0]);
+						fprintf(stderr, "Unknown character: %c\n", token[0]);
 						exit(EXIT_FAILURE);
 				}
 			}
