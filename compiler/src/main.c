@@ -24,18 +24,15 @@ int main(int argc, char** argv) {
 	if(argc < 3) return -1;
 	FILE *in = fopen(argv[1], "rt");
 	pthread_attr_init(&attr);
-	char buf[256];
-	fgets(buf, 256, in);
+	char buf[3][256];
+	fgets(buf[0], 256, in);
 	double a, b;
-	sscanf(buf, "%lf %lf", &a, &b);
+	sscanf(buf[0], "%lf %lf", &a, &b);
 	AST* trees[6];
 	for(size_t i = 0; i < 3; ++i) {
-		fgets(buf, 256, in);
-		pthread_create(&tid[i], &attr, get_trees, buf);
-		trees[i] = parse(buf);
-		trees[i + 3] = derivative(trees[i]);
+		fgets(buf[i], 256, in);
+		pthread_create(&tid[i], &attr, get_trees, buf[i]);
 	}
-	for(int i = 0; i < 6; ++i) optimize(trees[i]);
 	void *res_trees;
 	for(int i = 0; i < 3; ++i) {
 		pthread_join(tid[i], &res_trees);
