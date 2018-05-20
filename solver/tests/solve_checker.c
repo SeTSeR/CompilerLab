@@ -13,7 +13,6 @@ int check_solve_sinus() {
 		fprintf(stderr, "Test %d failed: sin(%lf) != 0\n", testnum, rt);
 		return 0;
 	}
-	fprintf(stdout, "Test %d answer: %lf\n", testnum, rt);
 	return 1;
 }
 
@@ -23,7 +22,6 @@ int check_solve_cube() {
 		fprintf(stderr, "Test %d failed: %lf^3 != 2\n", testnum, rt);
 		return 0;
 	}
-	fprintf(stdout, "Test %d answer: %lf\n", testnum, rt);
 	return 1;
 }
 
@@ -33,6 +31,5 @@ int check_solve_sincube() {
 		fprintf(stderr, "Test %d failed: sin(%lf) != %lf^3\n", testnum, rt, rt);
 		return 0;
 	}
-	fprintf(stdout, "Test %d answer: %lf\n", testnum, rt);
 	return 1;
 }

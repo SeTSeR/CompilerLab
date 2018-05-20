@@ -122,12 +122,6 @@ int main(int argc, char** argv) {
 	double x2 = root(g, dg, h, dh, *a, *b, eps1, iterations);
 	double x3 = root(h, dh, f, df, *a, *b, eps1, iterations);
 	double neweps1 = eps1 / dist(g(x1) - f(x1), h(x2) - g(x2), f(x3) - h(x3));
-	if(neweps1 < eps1) {
-		eps1 = neweps1;
-		double x1 = root(f, df, g, dg, *a, *b, eps1, iterations);
-		double x2 = root(g, dg, h, dh, *a, *b, eps1, iterations);
-		double x3 = root(h, dh, f, df, *a, *b, eps1, iterations);
-	}
 	if(debug) {
 		printf("f(x):\n");
 		for(double x = *a; x <= *b; x += 0.5) {
@@ -154,6 +148,12 @@ int main(int argc, char** argv) {
 			printf("%f ", (*dh)(x));
 		}
 		printf("\n");
+	}
+	if(neweps1 < eps1) {
+		eps1 = neweps1;
+		double x1 = root(f, df, g, dg, *a, *b, eps1, iterations);
+		double x2 = root(g, dg, h, dh, *a, *b, eps1, iterations);
+		double x3 = root(h, dh, f, df, *a, *b, eps1, iterations);
 	}
 	if(roots){
 		printf("Roots: %f %f %f\n", x1, x2, x3);
