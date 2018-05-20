@@ -59,7 +59,7 @@ bool equal(AST *first, AST *second) {
 	if(first->type != second->type) return false;
 	switch(first->type) {
 		case NUMBER:
-			return (fabs(first->value - second->value < eps));
+			return (fabs(first->value - second->value) < eps);
 			break;
 		case VARIABLE:
             return true;
