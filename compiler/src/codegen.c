@@ -152,6 +152,27 @@ static char* gen_node(AST* node, identifiers_table *table) {
                     free(leftnode);
                     free(rightnode);
 					break;
+				case POWER:
+                    leftnode = gen_node(node->first_param, table);
+                    rightnode = gen_node(node->second_param, table);
+					append(ans, leftnode);
+					append(ans, rightnode);
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp + 8]");
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
+					append_line(FUNC_LEVEL, ans, "fxch");
+					append_line(FUNC_LEVEL, ans, "fyl2x");
+					append_line(FUNC_LEVEL, ans, "fld1");
+					append_line(FUNC_LEVEL, ans, "fld st1");
+					append_line(FUNC_LEVEL, ans, "fprem");
+					append_line(FUNC_LEVEL, ans, "f2xm1");
+					append_line(FUNC_LEVEL, ans, "faddp");
+					append_line(FUNC_LEVEL, ans, "fscale");
+					append_line(FUNC_LEVEL, ans, "fstp st1");
+					append_line(FUNC_LEVEL, ans, "add rsp, 8");
+					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
+                    free(leftnode);
+                    free(rightnode);
+					break;
 				case SIN:
                     leftnode = gen_node(node->first_param, table);
 					append(ans, leftnode);
@@ -183,6 +204,15 @@ static char* gen_node(AST* node, identifiers_table *table) {
 					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
 					append_line(FUNC_LEVEL, ans, "fptan");
 					append_line(FUNC_LEVEL, ans, "fdivp");
+					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
+                    free(leftnode);
+					break;
+				case LN:
+                    leftnode = gen_node(node->first_param, table);
+					append(ans, leftnode);
+					append_line(FUNC_LEVEL, ans, "fld1");
+					append_line(FUNC_LEVEL, ans, "fld qword[rsp]");
+					append_line(FUNC_LEVEL, ans, "fyl2x");
 					append_line(FUNC_LEVEL, ans, "fstp qword[rsp]");
                     free(leftnode);
 					break;

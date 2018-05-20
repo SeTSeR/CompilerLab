@@ -49,6 +49,12 @@ AST *parse(char *str) {
 					AST *argast = pop(stack);
 					tokast->first_param = argast;
 				}		
+				else if(strncmp(token, "ln", 2) == 0) {
+					tokast->type = OPERATOR;
+					tokast->op_type = LN;
+					AST *argast = pop(stack);
+					tokast->first_param = argast;
+				}
 			}
 			else if(isdigit(token[0])) {
 				tokast->type = NUMBER;
@@ -73,6 +79,9 @@ AST *parse(char *str) {
 						break;
 					case '/':
 						tokast->op_type = DIVIDE;
+						break;
+					case '^':
+						tokast->op_type = POWER;
 						break;
 					default:
 						fprintf(stderr, "Unknown character: %c\n", token[0]);

@@ -15,10 +15,12 @@ enum OPERATOR_TYPE {
 	MINUS,
 	MULTIPLY,
 	DIVIDE,
+	POWER,
 	SIN,
 	COS,
 	TAN,
-	CTG
+	CTG,
+	LN
 };
 
 struct AST {

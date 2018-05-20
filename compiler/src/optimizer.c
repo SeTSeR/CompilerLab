@@ -46,6 +46,15 @@ static void fold_constants(AST* tree) {
 					tree->value = value;
 				}
 				break;
+			case POWER:
+				if(is_number(tree->first_param) && is_number(tree->second_param)) {
+					tree->type = NUMBER;
+					double value = pow(tree->first_param->value, tree->second_param->value);
+					destroy_tree(tree->first_param);
+					destroy_tree(tree->second_param);
+					tree->value = value;
+				}
+				break;
 			case SIN:
 				if(is_number(tree->first_param)) {
 					tree->type = NUMBER;
@@ -74,6 +83,14 @@ static void fold_constants(AST* tree) {
 				if(is_number(tree->first_param)) {
 					tree->type = NUMBER;
 					double value = 1/tan(tree->first_param->value);
+					destroy_tree(tree->first_param);
+					tree->value = value;
+				}
+				break;
+			case LN:
+				if(is_number(tree->first_param)) {
+					tree->type = NUMBER;
+					double value = log(tree->first_param->value);
 					destroy_tree(tree->first_param);
 					tree->value = value;
 				}
@@ -156,6 +173,26 @@ static void optimize_arithmetic(AST* tree) {
 					tree->value = 1;
 				}
 				break;
+			case POWER:
+				if(is_zero(tree->first_param)) {
+					free(tree->first_param);
+					destroy_tree(tree->second_param);
+					tree->type = NUMBER;
+					tree->value = 0;
+				}	
+				else if(is_one(tree->first_param)) {
+					free(tree->first_param);
+					destroy_tree(tree->second_param);
+					tree->type = NUMBER;
+					tree->value = 1;
+				}
+				if(is_zero(tree->second_param)) {
+					destroy_tree(tree->first_param);
+					free(tree->second_param);
+					tree->type = NUMBER;
+					tree->value = 1;
+				}
+				break;
 			default:
 				break;
 		}
@@ -165,4 +202,5 @@ static void optimize_arithmetic(AST* tree) {
 void optimize(AST* tree) {
 	fold_constants(tree);
 	optimize_arithmetic(tree);
+	fold_constants(tree);
 }

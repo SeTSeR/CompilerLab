@@ -63,6 +63,20 @@ AST* derivative(AST* function) {
 					ans->first_param = nominator;
 					ans->second_param = denominator;
 					break;
+				case POWER:
+					ans->op_type = MULTIPLY;
+					ans->first_param = copy_ast(function);
+					AST* todiff = create_tree();
+					todiff->type = OPERATOR;
+					todiff->op_type = MULTIPLY;
+					todiff->first_param = copy_ast(function->second_param);
+					todiff->second_param = create_tree();
+					todiff->second_param->type = OPERATOR;
+					todiff->second_param->op_type = LN;
+					todiff->second_param->first_param = copy_ast(function->first_param);
+					ans->second_param = derivative(todiff);
+					destroy_tree(todiff);
+					break;
 				case SIN:
 					ans->op_type = MULTIPLY;
 					AST* leftarg = create_tree();
@@ -126,6 +140,11 @@ AST* derivative(AST* function) {
 					rightarg->second_param = rrarg;
 					ans->first_param = leftarg;
 					ans->second_param = rightarg;
+					break;
+				case LN:
+					ans->op_type = DIVIDE;
+					ans->first_param = derivative(function->first_param);
+					ans->second_param = copy_ast(function->first_param);
 					break;
 				default:
 					fprintf(stderr, "Unknown operator type: %d\n", function->op_type);

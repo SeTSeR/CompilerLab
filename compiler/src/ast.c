@@ -127,6 +127,9 @@ void print_tree(AST* tree, int level, FILE* log) {
 					case DIVIDE:
 						operator_type = "/";
 						break;
+					case POWER:
+						operator_type = "^";
+						break;
 					case SIN:
 						operator_type = "sin";
 						break;
@@ -138,6 +141,8 @@ void print_tree(AST* tree, int level, FILE* log) {
 						break;
 					case CTG:
 						operator_type = "ctg";
+					case LN:
+						operator_type = "ln";
 						break;
 				}
 				fprintf(log, "%sNode value: %s\n", spaces, operator_type);

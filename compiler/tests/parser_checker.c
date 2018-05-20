@@ -95,3 +95,72 @@ int check_parse4() {
 	destroy_tree(parsed);
 	return answer;
 }
+
+int check_parse5() {
+	char toparse[] = "2 x ^";
+	AST *parsed = parse(toparse);
+	AST *matching = create_tree();
+	matching->type = OPERATOR;
+	matching->op_type = POWER;
+	matching->first_param = create_tree();
+	matching->first_param->type = NUMBER;
+	matching->first_param->value = 2.0;
+	matching->second_param = create_tree();
+	matching->second_param->type = VARIABLE;
+	int answer = equal(matching, parsed);
+	if(answer == 0) {
+		fprintf(stderr, "Test %d failed:\n", testnum);
+		fprintf(stderr, "Incorrect tree parsing. Expected:\n");
+		print_tree(matching, 4, stderr);
+		fprintf(stderr, "\nGot:\n");
+		print_tree(parsed, 4, stderr);
+	}
+	destroy_tree(matching);
+	destroy_tree(parsed);
+	return answer;
+}
+
+int check_parse6() {
+	char toparse[] = "x 2 ^";
+	AST *parsed = parse(toparse);
+	AST *matching = create_tree();
+	matching->type = OPERATOR;
+	matching->op_type = POWER;
+	matching->first_param = create_tree();
+	matching->first_param->type = VARIABLE;
+	matching->second_param = create_tree();
+	matching->second_param->type = NUMBER;
+	matching->second_param->value = 2.0;
+	int answer = equal(matching, parsed);
+	if(answer == 0) {
+		fprintf(stderr, "Test %d failed:\n", testnum);
+		fprintf(stderr, "Incorrect tree parsing. Expected:\n");
+		print_tree(matching, 4, stderr);
+		fprintf(stderr, "\nGot:\n");
+		print_tree(parsed, 4, stderr);
+	}
+	destroy_tree(matching);
+	destroy_tree(parsed);
+	return answer;
+}
+
+int check_parse7() {
+	char toparse[] = "x ln";
+	AST *parsed = parse(toparse);
+	AST *matching = create_tree();
+	matching->type = OPERATOR;
+	matching->op_type = LN;
+	matching->first_param = create_tree();
+	matching->first_param->type = VARIABLE;
+	int answer = equal(matching, parsed);
+	if(answer == 0) {
+		fprintf(stderr, "Test %d failed:\n", testnum);
+		fprintf(stderr, "Incorrect tree parsing. Expected:\n");
+		print_tree(matching, 4, stderr);
+		fprintf(stderr, "\nGot:\n");
+		print_tree(parsed, 4, stderr);
+	}
+	destroy_tree(matching);
+	destroy_tree(parsed);
+	return answer;
+}
