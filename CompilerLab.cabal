@@ -2,16 +2,16 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b83014e16db619e6976e6a8cd4db07fba56cfa3a7b3d4a514b1a828d424f845f
+-- hash: 9ef30bb850f8955782715e0fed251f5b665018db26d8545d103e56f291ed87e5
 
 name:           CompilerLab
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/CompilerLab#readme>
-homepage:       https://github.com/githubuser/CompilerLab#readme
-bug-reports:    https://github.com/githubuser/CompilerLab/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2018 Author name here
+homepage:       https://github.com/SeTSeR/CompilerLab#readme
+bug-reports:    https://github.com/SeTSeR/CompilerLab/issues
+author:         Sergey Makarov
+maintainer:     setser200018@gmail.com
+copyright:      2018 Sergey Makarov
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -22,7 +22,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/CompilerLab
+  location: https://github.com/SeTSeR/CompilerLab
 
 library
   exposed-modules:
@@ -33,6 +33,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , mtl >=2.2.2 && <3
   default-language: Haskell2010
 
 executable CompilerLab-exe
@@ -45,6 +46,7 @@ executable CompilerLab-exe
   build-depends:
       CompilerLab
     , base >=4.7 && <5
+    , mtl >=2.2.2 && <3
   default-language: Haskell2010
 
 test-suite CompilerLab-test
@@ -58,4 +60,5 @@ test-suite CompilerLab-test
   build-depends:
       CompilerLab
     , base >=4.7 && <5
+    , mtl >=2.2.2 && <3
   default-language: Haskell2010
