@@ -9,7 +9,11 @@ import System.Environment
 import System.Exit
 
 parseArgs :: ExceptT String IO Config
-parseArgs = undefined
+parseArgs = do
+    args <- lift getArgs
+    case args of
+        infile:outfile:_ -> return $ config infile outfile
+        _ -> throwError "You must specify at least two arguments: source file and destination file"
 
 main :: IO ()
 main = do
