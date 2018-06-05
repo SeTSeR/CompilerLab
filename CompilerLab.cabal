@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9ef30bb850f8955782715e0fed251f5b665018db26d8545d103e56f291ed87e5
+-- hash: 625a13ea47b6a2fc771f4089dc00ffc9a4c96a61a80c5a67230d279157ff02c4
 
 name:           CompilerLab
 version:        0.1.0.0
@@ -26,6 +26,8 @@ source-repository head
 
 library
   exposed-modules:
+      Backend
+      Frontend
       Lib
   other-modules:
       Paths_CompilerLab

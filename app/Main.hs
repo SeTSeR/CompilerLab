@@ -3,8 +3,8 @@ module Main where
 
 import Lib
 
-import Data.Either
 import Control.Monad.Except
+import Data.Either
 import System.Environment
 import System.Exit
 
