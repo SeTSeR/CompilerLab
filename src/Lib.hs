@@ -8,6 +8,7 @@ import Frontend
 import Backend
 
 import Control.Monad.Except
+import Control.Monad.Writer
 import Data.Either
 import Data.Functor.Identity
 import Text.Read
@@ -27,13 +28,13 @@ compile :: Config -> ExceptT String IO ()
 compile config = do
     tocompile <- liftIO $ readFile $ inputfile config
     let str:functions = lines tocompile
-    borders <- toExceptT $ borders str
-    functions <- toExceptT $ foldr collect (return []) functions
+    borders <- toExceptTWith show $ borders str
+    functions <- toExceptTWith (msum . map show) $ foldr collect (return []) functions
     let derivs = map derivative functions
     liftIO $ writeFile (outfile config) $ genCode borders functions derivs
 
-toExceptT :: (Show a) => Except a b -> ExceptT String IO b
-toExceptT = mapExceptT (return . runIdentity) . withExcept show
+toExceptTWith :: (a -> c) -> Except a b -> ExceptT c IO b
+toExceptTWith func = mapExceptT (return . runIdentity) . withExcept func
 
 collect :: String -> Except [ParseError] [AST] -> Except [ParseError] [AST]
 collect str result = case runExcept result of
