@@ -1,6 +1,6 @@
 module Frontend(
-    AST,
-    ParseError,
+    AST(..),
+    ParseError(..),
     borders,
     parse,
     derivative,
@@ -16,6 +16,7 @@ data AST = Variable | Number Double | UnaryOperator String AST | BinaryOperator 
     deriving (Show, Eq)
 
 data ParseError = BorderError | UnknownTokenError String | MissingParametersError String | OddTokensError | EmptyInputError
+    deriving Eq
 
 instance Show ParseError where
     show BorderError = "Incorrect borders"
