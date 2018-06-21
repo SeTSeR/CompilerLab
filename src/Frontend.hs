@@ -13,7 +13,13 @@ import Text.Read(readEither)
 import System.IO.Unsafe
 
 data AST = Variable | Number Double | UnaryOperator String AST | BinaryOperator String AST AST
-    deriving (Show, Eq)
+    deriving Eq
+
+instance Show AST where
+    show Variable = "x"
+    show (Number n) = show n
+    show (UnaryOperator token arg) = "(" ++ token ++ " " ++ (show arg) ++ ")"
+    show (BinaryOperator token left right) = "(" ++ (show left) ++ " " ++ token ++ " " ++ (show right) ++ ")"
 
 data ParseError = BorderError | UnknownTokenError String | MissingParametersError String | OddTokensError | EmptyInputError
     deriving Eq
@@ -42,7 +48,11 @@ parseToken stack token = do
     case (readEither token) :: Either String Double of
         Right value -> return $ (Number value):stack
         _ -> if token == "x"
-            then return $ Variable:stack
+                then return $ Variable:stack
+            else if token == "e"
+                then return $ (Number $ exp 1):stack
+            else if token == "pi"
+                then return $ (Number pi):stack
             else if token `elem` unaryOperators
                 then case stack of
                     arg:xs -> return $ (UnaryOperator token arg):xs
@@ -62,4 +72,17 @@ parse str = do
         _ -> throwError EmptyInputError
 
 derivative :: AST -> AST
-derivative = id
+derivative Variable = Number 1
+derivative (Number _) = Number 0
+derivative (UnaryOperator token arg) = case token of
+    "sin" -> BinaryOperator "*" (UnaryOperator "cos" arg) (derivative arg)
+    "cos" -> BinaryOperator "*" (BinaryOperator "*" (Number $ -1) (UnaryOperator "sin" arg)) (derivative arg)
+    "tan" -> BinaryOperator "/" (derivative arg) (BinaryOperator "*" (UnaryOperator "cos" arg) (UnaryOperator "cos" arg))
+    "ctg" -> BinaryOperator "/" (BinaryOperator "*" (Number $ -1) (derivative arg)) (BinaryOperator "*" (UnaryOperator "sin" arg) (UnaryOperator "sin" arg))
+    "ln" -> BinaryOperator "/" (derivative arg) arg
+derivative tree@(BinaryOperator token left right) = case token of
+    "+" -> BinaryOperator "+" (derivative left) (derivative right)
+    "-" -> BinaryOperator "-" (derivative left) (derivative right)
+    "*" -> BinaryOperator "+" (BinaryOperator "*" (derivative left) right) (BinaryOperator "*" left (derivative right))
+    "/" -> BinaryOperator "/" (BinaryOperator "-" (BinaryOperator "*" (derivative left) right) (BinaryOperator "*" left (derivative right))) (BinaryOperator "*" right right)
+    "^" -> BinaryOperator "*" (BinaryOperator "^" left right) (derivative $ BinaryOperator "*" right (UnaryOperator "ln" left))
