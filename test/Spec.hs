@@ -10,11 +10,11 @@ test2 = TestCase $ assertEqual "for parsing complex expression: " (Right (Binary
 
 test3 = TestCase $ assertEqual "for parsing erroneous expression: " (Left (MissingParametersError "+")) (runExcept $ parse "2 +")
 
-test4 = TestCase $ assertEqual "simple derivative: " (runExcept $ derivative <$> parse "x 2 +") (runExcept $ parse "1 0 +")
+test4 = TestCase $ assertEqual "simple derivative: " (runExcept $ parse "1 0 +") (runExcept $ derivative <$> parse "x 2 +")
 
-test5 = TestCase $ assertEqual "more complex derivative: " (runExcept $ derivative <$> parse "x sin 3 *") (runExcept $ parse "-1 x cos x cos * / * 3 x sin 3 * +")
+test5 = TestCase $ assertEqual "more complex derivative: " (runExcept $ parse "-1 x cos x cos * / * 3 x sin 3 * +") (runExcept $ derivative <$> parse "x sin 3 *")
 
-test6 = TestCase $ assertEqual "third derivative: " (runExcept $ derivative <$> parse "x x ln *") (runExcept $ parse "1 x ln * x 1 x / * +")
+test6 = TestCase $ assertEqual "third derivative: " (runExcept $ parse "1 x ln * x 1 x / * +") (runExcept $ derivative <$> parse "x x ln *")
 
 main :: IO ()
 main = do
