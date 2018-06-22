@@ -89,10 +89,10 @@ derivative (BinaryOperator token left right) = case token of
     "^" -> BinaryOperator "*" (BinaryOperator "^" left right) (derivative $ BinaryOperator "*" right (UnaryOperator "ln" left))
 
 optimize :: AST -> AST
-optimize = foldConstants . arithmeticOptimizations
+optimize = foldConstants . arithmeticOptimizations . foldConstants
 
 foldConstants :: AST -> AST
-foldConstants (UnaryOperator token arg) = case optimize arg of
+foldConstants (UnaryOperator token arg) = case foldConstants arg of
     Number x -> case token of
         "sin" -> Number $ sin x
         "cos" -> Number $ cos x
@@ -100,7 +100,7 @@ foldConstants (UnaryOperator token arg) = case optimize arg of
         "ctg" -> Number $ 1.0 / tan x
         "ln"  -> Number $ log x
     tree -> tree
-foldConstants (BinaryOperator token left right) = case (optimize left, optimize right) of
+foldConstants (BinaryOperator token left right) = case (foldConstants left, foldConstants right) of
     (Number a, Number b) -> case token of
         "+" -> Number $ a + b
         "-" -> Number $ a - b
@@ -111,4 +111,40 @@ foldConstants (BinaryOperator token left right) = case (optimize left, optimize 
 foldConstants tree = tree
 
 arithmeticOptimizations :: AST -> AST
-arithmeticOptimizations = id
+arithmeticOptimizations (BinaryOperator token left right) = let updatedTree = BinaryOperator token (arithmeticOptimizations left) (arithmeticOptimizations right)
+                                                            in case token of
+                                                                "+" -> additionOptimizations updatedTree
+                                                                "-" -> substractionOptimizations updatedTree
+                                                                "*" -> multiplicationOptimizations updatedTree
+                                                                "/" -> divisionOptimizations updatedTree
+                                                                "^" -> powerOptimizations updatedTree
+arithmeticOptimizations (UnaryOperator token arg) = UnaryOperator token (arithmeticOptimizations arg)
+arithmeticOptimizations tree = tree
+
+additionOptimizations :: AST -> AST
+additionOptimizations (BinaryOperator "+" left (Number 0)) = left
+additionOptimizations (BinaryOperator "+" (Number 0) right) = right
+additionOptimizations tree = tree
+
+substractionOptimizations :: AST -> AST
+substractionOptimizations (BinaryOperator "-" left (Number 0)) = left
+substractionOptimizations (BinaryOperator "-" left right) | left == right = Number 0
+substractionOptimizations tree = tree
+
+multiplicationOptimizations :: AST -> AST
+multiplicationOptimizations (BinaryOperator "*" _ (Number 0)) = Number 0
+multiplicationOptimizations (BinaryOperator "*" (Number 0) _) = Number 0
+multiplicationOptimizations (BinaryOperator "*" left (Number 1)) = left
+multiplicationOptimizations (BinaryOperator "*" (Number 1) right) = right
+multiplicationOptimizations tree = tree
+
+divisionOptimizations :: AST -> AST
+divisionOptimizations (BinaryOperator "/" (Number 0) _) = Number 0
+divisionOptimizations (BinaryOperator "/" left right) | left == right = Number 1
+divisionOptimizations tree = tree
+
+powerOptimizations :: AST -> AST
+powerOptimizations (BinaryOperator "^" (Number 0) _) = Number 0
+powerOptimizations (BinaryOperator "^" (Number 1) _) = Number 1
+powerOptimizations (BinaryOperator "^" _ (Number 0)) = Number 1
+powerOptimizations tree = tree
