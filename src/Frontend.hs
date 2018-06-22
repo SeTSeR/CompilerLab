@@ -99,7 +99,7 @@ foldConstants (UnaryOperator token arg) = case foldConstants arg of
         "tan" -> Number $ tan x
         "ctg" -> Number $ 1.0 / tan x
         "ln"  -> Number $ log x
-    tree -> tree
+    tree -> UnaryOperator token tree
 foldConstants (BinaryOperator token left right) = case (foldConstants left, foldConstants right) of
     (Number a, Number b) -> case token of
         "+" -> Number $ a + b
