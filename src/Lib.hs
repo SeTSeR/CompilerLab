@@ -31,7 +31,7 @@ compile config = do
     borders <- toExceptTWith show $ borders str
     functions <- toExceptTWith (msum . map show) $ foldr collect (return []) functions
     let derivs = map derivative functions
-    liftIO $ writeFile (outfile config) $ genCode borders functions derivs
+    liftIO $ writeFile (outfile config) $ genCode borders (map optimize functions) (map optimize derivs)
 
 toExceptTWith :: (a -> c) -> Except a b -> ExceptT c IO b
 toExceptTWith func = mapExceptT (return . runIdentity) . withExcept func
