@@ -92,6 +92,22 @@ optimize :: AST -> AST
 optimize = foldConstants . arithmeticOptimizations
 
 foldConstants :: AST -> AST
+foldConstants (UnaryOperator token arg) = case optimize arg of
+    Number x -> case token of
+        "sin" -> Number $ sin x
+        "cos" -> Number $ cos x
+        "tan" -> Number $ tan x
+        "ctg" -> Number $ 1.0 / tan x
+        "ln"  -> Number $ log x
+    tree -> tree
+foldConstants (BinaryOperator token left right) = case (optimize left, optimize right) of
+    (Number a, Number b) -> case token of
+        "+" -> Number $ a + b
+        "-" -> Number $ a - b
+        "*" -> Number $ a * b
+        "/" -> Number $ a / b
+        "^" -> Number $ a ** b
+    (left, right) -> BinaryOperator token left right
 foldConstants tree = tree
 
 arithmeticOptimizations :: AST -> AST
