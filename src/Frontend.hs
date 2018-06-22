@@ -4,6 +4,7 @@ module Frontend(
     borders,
     parse,
     derivative,
+    optimize
 ) where
 
 import Control.Monad.Except
@@ -80,9 +81,18 @@ derivative (UnaryOperator token arg) = case token of
     "tan" -> BinaryOperator "/" (derivative arg) (BinaryOperator "*" (UnaryOperator "cos" arg) (UnaryOperator "cos" arg))
     "ctg" -> BinaryOperator "/" (BinaryOperator "*" (Number $ -1) (derivative arg)) (BinaryOperator "*" (UnaryOperator "sin" arg) (UnaryOperator "sin" arg))
     "ln" -> BinaryOperator "/" (derivative arg) arg
-derivative tree@(BinaryOperator token left right) = case token of
+derivative (BinaryOperator token left right) = case token of
     "+" -> BinaryOperator "+" (derivative left) (derivative right)
     "-" -> BinaryOperator "-" (derivative left) (derivative right)
     "*" -> BinaryOperator "+" (BinaryOperator "*" (derivative left) right) (BinaryOperator "*" left (derivative right))
     "/" -> BinaryOperator "/" (BinaryOperator "-" (BinaryOperator "*" (derivative left) right) (BinaryOperator "*" left (derivative right))) (BinaryOperator "*" right right)
     "^" -> BinaryOperator "*" (BinaryOperator "^" left right) (derivative $ BinaryOperator "*" right (UnaryOperator "ln" left))
+
+optimize :: AST -> AST
+optimize = foldConstants . arithmeticOptimizations
+
+foldConstants :: AST -> AST
+foldConstants tree = tree
+
+arithmeticOptimizations :: AST -> AST
+arithmeticOptimizations = id
