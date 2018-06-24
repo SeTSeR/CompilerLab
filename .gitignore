@@ -3,4 +3,4 @@ out/
 build/
 .wakatime-project
 report/
-haskell-compiler/.stack-work/
+compiler-haskell/.stack-work/
