@@ -1,7 +1,7 @@
 name:                CompilerLab
 version:             0.1.0.0
 github:              "SeTSeR/CompilerLab"
-license:             BSD3
+license:             MIT
 author:              "Sergey Makarov"
 maintainer:          "setser200018@gmail.com"
 copyright:           "2018 Sergey Makarov"
