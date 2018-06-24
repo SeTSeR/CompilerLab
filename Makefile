@@ -4,6 +4,7 @@ METHOD ?= newton
 BUILD_DIR = build
 OUTPUT_DIR = out
 GENERATED_ASM = output.asm
+COMPILER ?= compiler
 
 all: build
 
@@ -22,12 +23,13 @@ solver_tests:
 
 dir:
 	mkdir -p $(OUTPUT_DIR)
+	mkdir -p $(BUILD_DIR)
 
 clean:
 	rm -r $(OUTPUT_DIR)
 	rm -r $(BUILD_DIR)
 
-libfunctions.so: compiler $(SPEC_FILE)
+libfunctions.so: $(COMPILER) $(SPEC_FILE)
 	$(OUTPUT_DIR)/compiler $(SPEC_FILE) $(OUTPUT_DIR)/$(GENERATED_ASM)
 	yasm $(YASMFLAGS) $(OUTPUT_DIR)/$(GENERATED_ASM) -o $(BUILD_DIR)/functions.o
 	gcc -shared -o $(OUTPUT_DIR)/libfunctions.so $(BUILD_DIR)/functions.o
@@ -40,4 +42,8 @@ compiler:
 	make -C compiler
 	mv compiler/compiler $(OUTPUT_DIR)/compiler
 
-.PHONY: solver compiler all clean
+compiler-haskell:
+	cd compiler-haskell; stack build
+	cp compiler-haskell/.stack-work/install/x86_64-linux-tinfo6/lts-11.11/8.2.2/bin/CompilerLab-exe $(OUTPUT_DIR)/compiler
+
+.PHONY: solver compiler compiler-haskell all clean

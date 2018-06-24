@@ -16,3 +16,7 @@ Test can be performed with the following command:
 ````
 make tests
 ````
+To build using compiler written in Haskell use:
+```
+COMPILER=compiler-haskell make
+```
