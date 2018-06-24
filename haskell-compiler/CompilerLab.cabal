@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 32a5d08f67847ad3d925b7b537980f9a81a10ec861f9d6c52db6e3c5657b2226
+-- hash: 2f01674af145c29a6529402105ab91f78e2224d7256dcf2bad985ed8eab9390f
 
 name:           CompilerLab
 version:        0.1.0.0
@@ -13,12 +13,10 @@ author:         Sergey Makarov
 maintainer:     setser200018@gmail.com
 copyright:      2018 Sergey Makarov
 license:        BSD3
-license-file:   LICENSE
 build-type:     Simple
 cabal-version:  >= 1.10
 extra-source-files:
     ChangeLog.md
-    README.md
 
 source-repository head
   type: git
