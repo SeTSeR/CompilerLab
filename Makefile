@@ -43,7 +43,7 @@ compiler:
 	mv compiler/compiler $(OUTPUT_DIR)/compiler
 
 compiler-haskell:
-	cd compiler-haskell; stack build
-	cp compiler-haskell/.stack-work/install/x86_64-linux-tinfo6/lts-11.11/8.2.2/bin/CompilerLab-exe $(OUTPUT_DIR)/compiler
+	cd compiler-haskell; stack build; stack install
+	mv $(HOME)/.local/bin/CompilerLab-exe $(OUTPUT_DIR)/compiler
 
-.PHONY: solver compiler compiler-haskell all clean
+.PHONY: solver compiler tests compiler-haskell all clean

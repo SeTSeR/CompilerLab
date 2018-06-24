@@ -1,4 +1,4 @@
-CFLAGS = -g -Iinclude -c
+CFLAGS = -g -Iinclude -c -std=gnu99
 LDFLAGS = -ldl -lm -lpthread
 TSTLDFLAGS = -lm
 SRC_DIR = src

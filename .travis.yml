@@ -1,0 +1,18 @@
+language: generic
+
+addons:
+    apt:
+        packages:
+            - libgmp-dev
+            - yasm
+
+before_install:
+- mkdir -p ~/.local/bin
+- export PATH=$HOME/.local/bin:$PATH
+- travis_retry curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+
+install:
+- cd compiler-haskell && stack --no-terminal --install-ghc test --only-dependencies && cd ..
+
+script:
+- make tests && make clean && COMPILER=compiler-haskell make
