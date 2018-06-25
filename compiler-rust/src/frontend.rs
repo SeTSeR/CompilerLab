@@ -40,3 +40,20 @@ impl Error for ParseError {
         None
     }
 }
+
+pub struct AST {
+    forest: Vec<Node>,
+}
+
+enum Node {
+}
+
+impl AST {
+    pub fn parse(_input: &str) -> Result<AST, ParseError> {
+        unimplemented!();
+    }
+
+    pub fn derivative(_function: &AST) -> AST {
+        unimplemented!();
+    }
+}
