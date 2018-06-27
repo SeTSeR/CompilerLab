@@ -70,7 +70,7 @@ impl Config {
 
 fn collect(acc: Result<Vec<AST>, CliError>, line: &str) -> Result<Vec<AST>, CliError> {
     let mut vec = acc?;
-    vec.push(AST::parse(line)?);
+    vec.push(frontend::parse(line)?);
     Ok(vec)
 }
 
@@ -98,7 +98,7 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
     let (_a, _b) = (bounds[0], bounds[1]);
 
     let functions = lines.fold(Ok(Vec::new()), collect)?;
-    let _derivatives: Vec<AST> = functions.iter().map(|tree| AST::derivative(&tree)).collect();
+    let _derivatives: Vec<AST> = functions.iter().map(|tree| frontend::derivative(&tree)).collect();
 
     Ok(())
 }
