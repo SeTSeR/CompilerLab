@@ -46,11 +46,12 @@ impl Error for ParseError {
 
 type Link<T> = Rc<RefCell<Box<T>>>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AST {
     root: Link<Node>
 }
 
+#[derive(Debug, Clone)]
 enum Node {
     Variable,
     Number(f64),
@@ -100,7 +101,95 @@ pub fn parse(input: &str) -> Result<AST, ParseError> {
     Ok(stack.pop().unwrap())
 }
 
-pub fn derivative(function: &AST) -> AST { unimplemented!(); }
+fn pack(node: Node) -> Link<Node> {
+    Rc::new(RefCell::new(Box::new(node)))
+}
+
+fn __derivative(function: &Node) -> Node {
+    match *function {
+        Node::Variable => Node::Number(1.0),
+        Node::Number(_) => Node::Number(0.0),
+        Node::UnaryOperator(ref token, ref arg) => {
+            match token.as_str() {
+                "sin" => Node::BinaryOperator("*".to_string(),
+                pack(Node::UnaryOperator("cos".to_string(), arg.clone())),
+                pack(__derivative(&**(*arg).borrow()))),
+
+                "cos" => Node::BinaryOperator("*".to_string(),
+                 pack(Node::Number(-1.0)),
+                 pack(Node::BinaryOperator("*".to_string(),
+                    pack(Node::UnaryOperator("sin".to_string(), arg.clone())),
+                    pack(__derivative(&**(*arg).borrow()))))),
+
+                "tan" => Node::BinaryOperator("/".to_string(),
+                pack(__derivative(&**(*arg).borrow())),
+                pack(Node::BinaryOperator("*".to_string(),
+                    pack(Node::UnaryOperator("cos".to_string(), arg.clone())),
+                    pack(Node::UnaryOperator("cos".to_string(), arg.clone()))))),
+
+                "ctg" => Node::BinaryOperator("/".to_string(),
+                pack(Node::BinaryOperator("*".to_string(),
+                    pack(Node::Number(-1.0)),
+                    pack(__derivative(&**(*arg).borrow())))),
+                pack(Node::BinaryOperator("*".to_string(),
+                    pack(Node::UnaryOperator("sin".to_string(), arg.clone())),
+                    pack(Node::UnaryOperator("sin".to_string(), arg.clone()))))),
+
+                "ln" => Node::BinaryOperator("/".to_string(),
+                pack(__derivative(&**(*arg).borrow())),
+                arg.clone()),
+
+                _ => Node::Variable
+            }
+        },
+        Node::BinaryOperator(ref token, ref left, ref right) => {
+            match token.as_str() {
+                "+" => Node::BinaryOperator("+".to_string(),
+                pack(__derivative(&**(*left).borrow())),
+                pack(__derivative(&**(*right).borrow()))),
+
+                "-" => Node::BinaryOperator("-".to_string(),
+                pack(__derivative(&**(*left).borrow())),
+                pack(__derivative(&**(*right).borrow()))),
+
+                "*" => Node::BinaryOperator("+".to_string(),
+                pack(Node::BinaryOperator("*".to_string(),
+                    pack(__derivative(&**(*left).borrow())),
+                    right.clone())),
+                pack(Node::BinaryOperator("*".to_string(),
+                    left.clone(),
+                    pack(__derivative(&**(*right).borrow()))))),
+
+                "/" => Node::BinaryOperator("/".to_string(),
+                pack(Node::BinaryOperator("+".to_string(),
+                    pack(Node::BinaryOperator("*".to_string(),
+                        pack(__derivative(&**(*left).borrow())),
+                        right.clone())),
+                    pack(Node::BinaryOperator("*".to_string(),
+                        left.clone(),
+                        pack(__derivative(&**(*right).borrow())))))),
+                pack(Node::BinaryOperator("*".to_string(),
+                    right.clone(),
+                    right.clone()))),
+
+                "^" => Node::BinaryOperator("*".to_string(),
+                pack(Node::BinaryOperator("^".to_string(),
+                    left.clone(),
+                    right.clone())),
+                pack(__derivative(&Node::BinaryOperator("*".to_string(),
+                    right.clone(),
+                    pack(Node::UnaryOperator("ln".to_string(), left.clone())))))),
+
+                _ => Node::Variable
+            }
+        }
+    }
+}
+
+pub fn derivative(function: &AST) -> AST {
+    let root = &**(*function.root).borrow();
+    AST::new(__derivative(root))
+}
 
 impl AST {
     fn new(node: Node) -> AST {
