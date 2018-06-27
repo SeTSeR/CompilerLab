@@ -44,7 +44,12 @@ impl Error for ParseError {
     }
 }
 
-type Link<T> = Rc<RefCell<Box<T>>>;
+pub trait Monoid {
+    fn mempty() -> Self;
+    fn mappend(&mut self, b: Self) -> ();
+}
+
+pub type Link<T> = Rc<RefCell<Box<T>>>;
 
 #[derive(Debug, Clone)]
 pub struct AST {
@@ -52,7 +57,7 @@ pub struct AST {
 }
 
 #[derive(Debug, Clone)]
-enum Node {
+pub enum Node {
     Variable,
     Number(f64),
     UnaryOperator(String, Link<Node>),
@@ -105,24 +110,24 @@ fn pack(node: Node) -> Link<Node> {
     Rc::new(RefCell::new(Box::new(node)))
 }
 
-fn __derivative(function: &Node) -> Node {
-    match *function {
+fn __derivative(function: &Link<Node>) -> Node {
+    match *(*function.borrow()) {
         Node::Variable => Node::Number(1.0),
         Node::Number(_) => Node::Number(0.0),
         Node::UnaryOperator(ref token, ref arg) => {
             match token.as_str() {
                 "sin" => Node::BinaryOperator("*".to_string(),
                 pack(Node::UnaryOperator("cos".to_string(), arg.clone())),
-                pack(__derivative(&**(*arg).borrow()))),
+                pack(__derivative(arg))),
 
                 "cos" => Node::BinaryOperator("*".to_string(),
                  pack(Node::Number(-1.0)),
                  pack(Node::BinaryOperator("*".to_string(),
                     pack(Node::UnaryOperator("sin".to_string(), arg.clone())),
-                    pack(__derivative(&**(*arg).borrow()))))),
+                    pack(__derivative(arg))))),
 
                 "tan" => Node::BinaryOperator("/".to_string(),
-                pack(__derivative(&**(*arg).borrow())),
+                pack(__derivative(arg)),
                 pack(Node::BinaryOperator("*".to_string(),
                     pack(Node::UnaryOperator("cos".to_string(), arg.clone())),
                     pack(Node::UnaryOperator("cos".to_string(), arg.clone()))))),
@@ -130,13 +135,13 @@ fn __derivative(function: &Node) -> Node {
                 "ctg" => Node::BinaryOperator("/".to_string(),
                 pack(Node::BinaryOperator("*".to_string(),
                     pack(Node::Number(-1.0)),
-                    pack(__derivative(&**(*arg).borrow())))),
+                    pack(__derivative(arg)))),
                 pack(Node::BinaryOperator("*".to_string(),
                     pack(Node::UnaryOperator("sin".to_string(), arg.clone())),
                     pack(Node::UnaryOperator("sin".to_string(), arg.clone()))))),
 
                 "ln" => Node::BinaryOperator("/".to_string(),
-                pack(__derivative(&**(*arg).borrow())),
+                pack(__derivative(arg)),
                 arg.clone()),
 
                 _ => Node::Variable
@@ -145,29 +150,29 @@ fn __derivative(function: &Node) -> Node {
         Node::BinaryOperator(ref token, ref left, ref right) => {
             match token.as_str() {
                 "+" => Node::BinaryOperator("+".to_string(),
-                pack(__derivative(&**(*left).borrow())),
-                pack(__derivative(&**(*right).borrow()))),
+                pack(__derivative(left)),
+                pack(__derivative(right))),
 
                 "-" => Node::BinaryOperator("-".to_string(),
-                pack(__derivative(&**(*left).borrow())),
-                pack(__derivative(&**(*right).borrow()))),
+                pack(__derivative(left)),
+                pack(__derivative(right))),
 
                 "*" => Node::BinaryOperator("+".to_string(),
                 pack(Node::BinaryOperator("*".to_string(),
-                    pack(__derivative(&**(*left).borrow())),
+                    pack(__derivative(left)),
                     right.clone())),
                 pack(Node::BinaryOperator("*".to_string(),
                     left.clone(),
-                    pack(__derivative(&**(*right).borrow()))))),
+                    pack(__derivative(right))))),
 
                 "/" => Node::BinaryOperator("/".to_string(),
                 pack(Node::BinaryOperator("+".to_string(),
                     pack(Node::BinaryOperator("*".to_string(),
-                        pack(__derivative(&**(*left).borrow())),
+                        pack(__derivative(left)),
                         right.clone())),
                     pack(Node::BinaryOperator("*".to_string(),
                         left.clone(),
-                        pack(__derivative(&**(*right).borrow())))))),
+                        pack(__derivative(right)))))),
                 pack(Node::BinaryOperator("*".to_string(),
                     right.clone(),
                     right.clone()))),
@@ -176,9 +181,9 @@ fn __derivative(function: &Node) -> Node {
                 pack(Node::BinaryOperator("^".to_string(),
                     left.clone(),
                     right.clone())),
-                pack(__derivative(&Node::BinaryOperator("*".to_string(),
+                pack(__derivative(&pack(Node::BinaryOperator("*".to_string(),
                     right.clone(),
-                    pack(Node::UnaryOperator("ln".to_string(), left.clone())))))),
+                    pack(Node::UnaryOperator("ln".to_string(), left.clone()))))))),
 
                 _ => Node::Variable
             }
@@ -187,8 +192,22 @@ fn __derivative(function: &Node) -> Node {
 }
 
 pub fn derivative(function: &AST) -> AST {
-    let root = &**(*function.root).borrow();
-    AST::new(__derivative(root))
+    AST::new(__derivative(&function.root))
+}
+
+fn collect_info<T: Monoid, F>(root: &Link<Node>, visit_node: &F) -> T
+    where F: Fn(&Link<Node>) -> T {
+    let mut info = T::mempty();
+    match *(*root.borrow()) {
+        Node::UnaryOperator(_, ref arg) => info.mappend(collect_info(arg, visit_node)),
+        Node::BinaryOperator(_, ref left, ref right) => {
+            info.mappend(collect_info(left, visit_node));
+            info.mappend(collect_info(right, visit_node));
+        }
+        _ => ()
+    }
+    info.mappend(visit_node(root));
+    info
 }
 
 impl AST {
@@ -196,5 +215,14 @@ impl AST {
         AST {
             root: Rc::new(RefCell::new(Box::new(node)))
         }
+    }
+
+    pub fn get_node(&self) -> &Link<Node> {
+        &self.root
+    }
+
+    pub fn collect_info<T: Monoid, F>(&self, visit_node: &F) -> T
+        where F: Fn(&Link<Node>) -> T {
+        collect_info(&self.root, visit_node)
     }
 }

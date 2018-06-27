@@ -3,8 +3,10 @@ use std::fmt;
 use std::fs::File;
 use std::io;
 use std::io::Read;
+use std::io::Write;
 
 mod frontend;
+mod backend;
 
 use frontend::AST;
 use frontend::ParseError;
@@ -95,10 +97,13 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
         Err(ParseError::BorderError)?
     }
 
-    let (_a, _b) = (bounds[0], bounds[1]);
+    let (a, b) = (bounds[0], bounds[1]);
 
     let functions = lines.fold(Ok(Vec::new()), collect)?;
-    let _derivatives: Vec<AST> = functions.iter().map(|tree| frontend::derivative(&tree)).collect();
+    let derivatives: Vec<AST> = functions.iter().map(|tree| frontend::derivative(&tree)).collect();
+    let output = backend::gen_code(a, b, functions, derivatives);
+    let mut outfile = File::open(config.outfile)?;
+    outfile.write_fmt(format_args!("{}", output))?;
 
     Ok(())
 }
