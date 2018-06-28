@@ -29,7 +29,7 @@ clean:
 	rm -r $(OUTPUT_DIR)
 	rm -r $(BUILD_DIR)
 	cd compiler-haskell ; stack clean
-	cd compiler-rust ; stack clean
+	cd compiler-rust ; cargo clean
 
 libfunctions.so: $(COMPILER) $(SPEC_FILE)
 	$(OUTPUT_DIR)/compiler $(SPEC_FILE) $(OUTPUT_DIR)/$(GENERATED_ASM)
