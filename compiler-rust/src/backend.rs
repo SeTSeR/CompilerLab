@@ -26,6 +26,11 @@ impl Number {
     fn new(val: f64) -> Number {
         Number(integer_decode(val))
     }
+
+    fn to_number(&self) -> f64 {
+        let Number((mantissa, exponent, sign)) = *self;
+        (sign as f64) * (mantissa as f64) * (2f64.powf(exponent as f64))
+    }
 }
 
 fn integer_decode(val: f64) -> (u64, i16, i8) {
@@ -76,16 +81,23 @@ fn gen_header(funccount: usize, derivcount: usize) -> String {
         .map(ToString::to_string)
         .collect();
     strings.append(&mut (1..(funccount + 1))
-        .map(|number| { format!("global f{}", number) })
+        .map(|number| format!("global f{}", number))
         .collect());
     strings.append(&mut (1..(funccount + 1))
-        .map(|number| { format!("global df{}", number) })
+        .map(|number| format!("global df{}", number))
         .collect());
     strings.join("\n")
 }
 
 fn gen_rodata(table: &HashMap<Number, String>, a: f64, b: f64) -> String {
-    "".to_string()
+    let elems = table.keys().zip(table.values());
+    let mut strings: Vec<String> = vec!["section .rodata".to_string()
+    , format!("    a dq {}", a)
+    , format!("    b dq {}", b)];
+    strings.append(&mut elems.map(|(key, value)| {
+        format!("    {} dq {}", value, key.to_number())
+    }).collect());
+    strings.join("\n")
 }
 
 fn gen_text(table: &HashMap<Number, String>, a: f64, b: f64) -> String {
