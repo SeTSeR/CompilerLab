@@ -163,7 +163,7 @@ fn gen_node(table: &HashMap<Number, String>, node: &Link<Node>) -> Vec<String> {
                              , "fdivp" ],
                 "ln"  => vec![ "fld1"
                              , "fxch"
-                             , "fy2lx" ],
+                             , "fyl2x" ],
                 _ => Vec::new()
             };
             lines.append(&mut body);
