@@ -102,7 +102,7 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
     let functions = lines.fold(Ok(Vec::new()), collect)?;
     let derivatives: Vec<AST> = functions.iter().map(|tree| frontend::derivative(&tree)).collect();
     let output = backend::gen_code(a, b, functions, derivatives);
-    let mut outfile = File::open(config.outfile)?;
+    let mut outfile = File::create(config.outfile)?;
     outfile.write_fmt(format_args!("{}", output))?;
 
     Ok(())
