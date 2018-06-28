@@ -71,8 +71,9 @@ pub fn gen_code(a: f64, b: f64, functions: Vec<AST>, derivatives: Vec<AST>) -> S
         .into_iter()
         .zip((1..(identcount + 1)).map(|num|format!("const{}", num)))
         .collect();
-    format!("{}\n{}\n{}", gen_header(functions.len(), derivatives.len()),
-    gen_rodata(&identifiers, a, b), gen_text(&identifiers, a, b))
+    format!("{}\n\n{}\n\n{}", gen_header(functions.len(), derivatives.len()),
+    gen_rodata(&identifiers, a, b),
+            gen_text(&identifiers, functions.as_slice(), derivatives.as_slice()))
 }
 
 fn gen_header(funccount: usize, derivcount: usize) -> String {
@@ -83,7 +84,7 @@ fn gen_header(funccount: usize, derivcount: usize) -> String {
     strings.append(&mut (1..(funccount + 1))
         .map(|number| format!("global f{}", number))
         .collect());
-    strings.append(&mut (1..(funccount + 1))
+    strings.append(&mut (1..(derivcount + 1))
         .map(|number| format!("global df{}", number))
         .collect());
     strings.join("\n")
@@ -100,6 +101,35 @@ fn gen_rodata(table: &HashMap<Number, String>, a: f64, b: f64) -> String {
     strings.join("\n")
 }
 
-fn gen_text(table: &HashMap<Number, String>, a: f64, b: f64) -> String {
-    "".to_string()
+fn gen_text(table: &HashMap<Number, String>, functions: &[AST], derivatives: &[AST]) -> String {
+    let fcount = functions.len();
+    let dcount = derivatives.len();
+    let functions = functions.iter().zip(1..(fcount + 1));
+    let derivatives = derivatives.iter().zip(1..(dcount + 1));
+    let mut lines = vec!["section .text".to_string()];
+    lines.append(&mut functions.flat_map(|func| subroutine(table, "f", func)).collect());
+    lines.append(&mut derivatives.flat_map(|func| subroutine(table, "df", func)).collect());
+    lines.join("\n")
+}
+
+fn subroutine(table: &HashMap<Number, String>, prefix: &str, func: (&AST, usize)) -> Vec<String> {
+    let (function, number) = func;
+    let mut prolog = vec![ "push rbp"
+                           , "mov rbp, rsp"
+                           , "sub rsp, 8"
+                           , "movsd qword[rsp], xmm0" ]
+        .into_iter()
+        .map(|str| format!("    {}", str))
+        .collect();
+    let mut epilog = vec![ "movsd xmm0, qword[rsp]"
+                            , "add rsp, 16"
+                            , "pop rbp"
+                            , "ret" ]
+        .into_iter()
+        .map(|str| format!("    {}", str))
+        .collect();
+    let mut lines = vec![format!("{}{}:", prefix, number)];
+    lines.append(&mut prolog);
+    lines.append(&mut epilog);
+    lines
 }
