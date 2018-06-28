@@ -28,6 +28,8 @@ dir:
 clean:
 	rm -r $(OUTPUT_DIR)
 	rm -r $(BUILD_DIR)
+	cd compiler-haskell ; stack clean
+	cd compiler-rust ; stack clean
 
 libfunctions.so: $(COMPILER) $(SPEC_FILE)
 	$(OUTPUT_DIR)/compiler $(SPEC_FILE) $(OUTPUT_DIR)/$(GENERATED_ASM)
@@ -46,4 +48,8 @@ compiler-haskell:
 	cd compiler-haskell; stack build; stack install
 	mv $(HOME)/.local/bin/CompilerLab-exe $(OUTPUT_DIR)/compiler
 
-.PHONY: solver compiler tests compiler-haskell all clean
+compiler-rust:
+	cd compiler-rust; cargo build
+	cp compiler-rust/target/debug/compiler-rust $(OUTPUT_DIR)/compiler
+
+.PHONY: solver compiler tests compiler-haskell compiler-rust all clean
