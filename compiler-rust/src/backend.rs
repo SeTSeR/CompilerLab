@@ -13,9 +13,17 @@ impl Monoid for HashSet<Number> {
     }
 
     fn mappend(&mut self, b: Self) -> () {
-        b.iter().for_each(|item| {
-            self.insert(item.clone());
-        })
+        self.extend(b.into_iter())
+    }
+}
+
+impl Monoid for Vec<String> {
+    fn mempty() -> Self {
+        Vec::new()
+    }
+
+    fn mappend(&mut self, b: Self) -> () {
+        self.extend(b.into_iter())
     }
 }
 
@@ -48,14 +56,6 @@ fn integer_decode(val: f64) -> (u64, i16, i8) {
 }
 
 pub fn gen_code(a: f64, b: f64, functions: Vec<AST>, derivatives: Vec<AST>) -> String {
-    let collect_node = |node: &Link<Node>| {
-        let mut table = HashSet::new();
-        match *(*node.borrow()) {
-            Node::Number(val) => table.insert(Number::new(val)),
-            _ => false,
-        };
-        table
-    };
     let identifiers = functions
         .iter()
         .zip(derivatives.iter())
@@ -71,13 +71,22 @@ pub fn gen_code(a: f64, b: f64, functions: Vec<AST>, derivatives: Vec<AST>) -> S
         .into_iter()
         .zip((1..(identcount + 1)).map(|num|format!("const{}", num)))
         .collect();
-    format!("{}\n\n{}\n\n{}", gen_header(functions.len(), derivatives.len()),
+    format!("{}\n\n{}\n\n{}\n", gen_header(functions.len(), derivatives.len()),
     gen_rodata(&identifiers, a, b),
             gen_text(&identifiers, functions.as_slice(), derivatives.as_slice()))
 }
 
+fn collect_node(node: &Link<Node>) -> HashSet<Number> {
+    let mut table = HashSet::new();
+    match *(*node.borrow()) {
+        Node::Number(val) => table.insert(Number::new(val)),
+        _ => false,
+    };
+    table
+}
+
 fn gen_header(funccount: usize, derivcount: usize) -> String {
-    let mut strings: Vec<String> = vec!["BITS 64", "default rel", " ", "global a", "global b"]
+    let mut strings: Vec<String> = vec!["[BITS 64]", "default rel", " ", "global a", "global b"]
         .into_iter()
         .map(ToString::to_string)
         .collect();
@@ -93,10 +102,10 @@ fn gen_header(funccount: usize, derivcount: usize) -> String {
 fn gen_rodata(table: &HashMap<Number, String>, a: f64, b: f64) -> String {
     let elems = table.keys().zip(table.values());
     let mut strings: Vec<String> = vec!["section .rodata".to_string()
-    , format!("    a dq {}", a)
-    , format!("    b dq {}", b)];
+    , format!("    a dq {:?}", a)
+    , format!("    b dq {:?}", b)];
     strings.append(&mut elems.map(|(key, value)| {
-        format!("    {} dq {}", value, key.to_number())
+        format!("    {} dq {:?}", value, key.to_number())
     }).collect());
     strings.join("\n")
 }
@@ -130,6 +139,61 @@ fn subroutine(table: &HashMap<Number, String>, prefix: &str, func: (&AST, usize)
         .collect();
     let mut lines = vec![format!("{}{}:", prefix, number)];
     lines.append(&mut prolog);
+    lines.append(&mut function.collect_info(&|node| gen_node(table, node)));
     lines.append(&mut epilog);
     lines
+}
+
+fn gen_node(table: &HashMap<Number, String>, node: &Link<Node>) -> Vec<String> {
+    match *(*node.borrow()) {
+
+        Node::Variable => vec!["    push qword[rbp - 8]".to_string()],
+
+        Node::Number(x) => vec![format!("    mov rax, qword[{}]", table[&Number::new(x)])
+        , "    push rax".to_string()],
+
+        Node::UnaryOperator(ref token, _) => {
+            let mut lines = vec!["fld qword[rsp]"];
+            let mut body = match token.as_str() {
+                "sin" => vec![ "fsin" ],
+                "cos" => vec![ "fcos" ],
+                "tan" => vec![ "fptan"
+                             , "fstp st0" ],
+                "ctg" => vec![ "fptan"
+                             , "fdivp" ],
+                "ln"  => vec![ "fld1"
+                             , "fxch"
+                             , "fy2lx" ],
+                _ => Vec::new()
+            };
+            lines.append(&mut body);
+            lines.push("fstp qword[rsp]");
+            lines.into_iter().map(|str| format!("    {}", str)).collect()
+        }
+
+        Node::BinaryOperator(ref token, _, _) => {
+            let mut lines = vec![ "fld qword[rsp + 8]"
+                                           , "fld qword[rsp]" ];
+            let mut body = match token.as_str() {
+                "+" => vec![ "faddp" ],
+                "-" => vec![ "fsubp" ],
+                "*" => vec![ "fmulp" ],
+                "/" => vec![ "fdivp" ],
+                "^" => vec![ "fxch"
+                           , "fyl2x"
+                           , "fld1"
+                           , "fld st1"
+                           , "fprem"
+                           , "f2xm1"
+                           , "faddp"
+                           , "fscale"
+                           , "fstp st1" ],
+                _ => Vec::new()
+            };
+            lines.append(&mut body);
+            lines.push("add rsp, 8");
+            lines.push("fstp qword[rsp]");
+            lines.into_iter().map(|str| format!("    {}", str)).collect()
+        }
+    }
 }

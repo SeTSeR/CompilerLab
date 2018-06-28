@@ -88,8 +88,8 @@ pub fn parse(input: &str) -> Result<AST, ParseError> {
                 stack.push(AST::new(Node::UnaryOperator(token.to_owned(), arg.root)));
             }
             else if binary_operators.contains(&token) {
-                let left = stack.pop().ok_or(ParseError::MissingParametersError(token.to_owned()))?;
                 let right = stack.pop().ok_or(ParseError::MissingParametersError(token.to_owned()))?;
+                let left = stack.pop().ok_or(ParseError::MissingParametersError(token.to_owned()))?;
                 stack.push(AST::new(Node::BinaryOperator(token.to_owned(), left.root, right.root)));
             }
             else {
@@ -215,10 +215,6 @@ impl AST {
         AST {
             root: Rc::new(RefCell::new(Box::new(node)))
         }
-    }
-
-    pub fn get_node(&self) -> &Link<Node> {
-        &self.root
     }
 
     pub fn collect_info<T: Monoid, F>(&self, visit_node: &F) -> T
