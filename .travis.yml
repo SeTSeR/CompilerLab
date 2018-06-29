@@ -1,10 +1,20 @@
-language: generic
+language: rust
 
 addons:
     apt:
         packages:
             - libgmp-dev
             - yasm
+
+rust:
+    - stable
+    - beta
+    - nightly
+
+matrix:
+    allow_failures:
+        - rust: nightly
+    fast_finish: true
 
 before_install:
 - mkdir -p ~/.local/bin
@@ -15,4 +25,4 @@ install:
 - cd compiler-haskell && stack --no-terminal --install-ghc test --only-dependencies && cd ..
 
 script:
-- make tests && make clean && COMPILER=compiler-haskell make
+- make test && make clean && COMPILER=compiler-haskell make && make clean && COMPILER=compiler-rust make
