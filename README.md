@@ -20,3 +20,8 @@ To build using compiler written in Haskell use:
 ```
 COMPILER=compiler-haskell make
 ```
+To build using compiler written in Rust use:
+```
+COMPILER=compiler-rust make
+```
+Note: for this compiler optimizations are not implemented, so code will be less effective.
