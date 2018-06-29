@@ -6,7 +6,7 @@ use std::error::Error;
 use std::rc::Rc;
 use std::cell::RefCell;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ParseError {
     BorderError,
     UnknownTokenError(String),
@@ -51,12 +51,12 @@ pub trait Monoid {
 
 pub type Link<T> = Rc<RefCell<Box<T>>>;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct AST {
     root: Link<Node>
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Node {
     Variable,
     Number(f64),
@@ -220,5 +220,55 @@ impl AST {
     pub fn collect_info<T: Monoid, F>(&self, visit_node: &F) -> T
         where F: Fn(&Link<Node>) -> T {
         collect_info(&self.root, visit_node)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn check_parse1() {
+        let tocheck = AST::new(Node::BinaryOperator("+".to_string(),
+        pack(Node::Number(2.0)), pack(Node::BinaryOperator("*".to_string(),
+            pack(Node::Number(3.0)), pack(Node::Number(5.0))))));
+        assert_eq!(parse("2 3 5 * +"), Ok(tocheck))
+    }
+
+    #[test]
+    fn check_parse2() {
+        let tocheck = AST::new(Node::BinaryOperator("/".to_string(),
+        pack(Node::Number(2.0)), pack(Node::UnaryOperator("sin".to_string(),
+            pack(Node::Variable)))));
+        assert_eq!(parse("2 x sin /"), Ok(tocheck))
+    }
+
+    #[test]
+    fn check_parse3() {
+        let tocheck = AST::new(Node::BinaryOperator("^".to_string(),
+        pack(Node::Number(2.0)), pack(Node::Variable)));
+        assert_eq!(parse("2 x ^"), Ok(tocheck))
+    }
+
+    #[test]
+    fn check_parse4() {
+        let tocheck = AST::new(Node::UnaryOperator("ln".to_string(),
+        pack(Node::Variable)));
+        assert_eq!(parse("x ln"), Ok(tocheck))
+    }
+
+    #[test]
+    fn check_parse_err_unknown_token() {
+        assert_eq!(parse("2 3 4 + \\"), Err(ParseError::UnknownTokenError("\\".to_string())))
+    }
+
+    #[test]
+    fn check_parse_err_missing_parameters() {
+        assert_eq!(parse("2 +"), Err(ParseError::MissingParametersError("+".to_string())))
+    }
+
+    #[test]
+    fn check_parse_err_odd_tokens() {
+        assert_eq!(parse("2 4 2 + * 5"), Err(ParseError::OddTokensError))
     }
 }
