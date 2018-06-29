@@ -4,3 +4,8 @@ build/
 .wakatime-project
 report/
 compiler-haskell/.stack-work/
+compiler-rust/.idea
+compiler-rust/cmake-build-debug
+compiler-rust/target
+compiler-haskell/output.asm
+compiler-rust/output.asm

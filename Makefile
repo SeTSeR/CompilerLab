@@ -13,10 +13,16 @@ build: dir solver
 run: build
 	$(OUTPUT_DIR)/main -f $(OUTPUT_DIR)/libfunctions.so
 
-tests: build compiler_tests solver_tests
+test: build compiler_tests compiler-haskell_tests compiler-rust_tests solver_tests
 
 compiler_tests:
 	make tests -C compiler
+
+compiler-haskell_tests:
+	cd compiler-haskell; stack test
+
+compiler-rust_tests:
+	cd compiler-rust; cargo test
 
 solver_tests:
 	make tests -C solver
@@ -26,6 +32,8 @@ dir:
 	mkdir -p $(BUILD_DIR)
 
 clean:
+	cd compiler-haskell ; stack clean
+	cd compiler-rust ; cargo clean
 	rm -r $(OUTPUT_DIR)
 	rm -r $(BUILD_DIR)
 
@@ -46,4 +54,8 @@ compiler-haskell:
 	cd compiler-haskell; stack build; stack install
 	mv $(HOME)/.local/bin/CompilerLab-exe $(OUTPUT_DIR)/compiler
 
-.PHONY: solver compiler tests compiler-haskell all clean
+compiler-rust:
+	cd compiler-rust; cargo build
+	cp compiler-rust/target/debug/compiler-rust $(OUTPUT_DIR)/compiler
+
+.PHONY: solver compiler tests compiler-haskell compiler-rust all clean
