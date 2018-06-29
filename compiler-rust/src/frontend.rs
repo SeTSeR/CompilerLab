@@ -166,7 +166,7 @@ fn __derivative(function: &Link<Node>) -> Node {
                     pack(__derivative(right))))),
 
                 "/" => Node::BinaryOperator("/".to_string(),
-                pack(Node::BinaryOperator("+".to_string(),
+                pack(Node::BinaryOperator("-".to_string(),
                     pack(Node::BinaryOperator("*".to_string(),
                         pack(__derivative(left)),
                         right.clone())),
@@ -270,5 +270,17 @@ mod test {
     #[test]
     fn check_parse_err_odd_tokens() {
         assert_eq!(parse("2 4 2 + * 5"), Err(ParseError::OddTokensError))
+    }
+
+    #[test]
+    fn check_derivative1() {
+        assert_eq!(parse("2 3 +").map(|func| derivative(&func)),
+                   parse("0 0 +"))
+    }
+
+    #[test]
+    fn check_derivative2() {
+        assert_eq!(parse("2 x tan *").map(|func| derivative(&func)),
+                   parse("0 x tan * 2 1 x cos x cos * / * +"))
     }
 }
