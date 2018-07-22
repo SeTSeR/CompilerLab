@@ -4,6 +4,7 @@ build/
 .wakatime-project
 report/
 compiler-haskell/.stack-work/
+compiler-haskell/CompilerLab.cabal
 compiler-rust/.idea
 compiler-rust/cmake-build-debug
 compiler-rust/target
