@@ -32,8 +32,8 @@ dir:
 	mkdir -p $(BUILD_DIR)
 
 clean:
-	cd compiler-haskell ; stack clean
-	cd compiler-rust ; cargo clean
+	-cd compiler-haskell ; stack clean
+	-cd compiler-rust ; cargo clean
 	rm -r $(OUTPUT_DIR)
 	rm -r $(BUILD_DIR)
 
